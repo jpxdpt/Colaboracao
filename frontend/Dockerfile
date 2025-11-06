@@ -10,7 +10,7 @@ ENV VITE_API_URL=$VITE_API_URL
 COPY package*.json ./
 
 # Instalar dependências (incluindo devDependencies para o build)
-RUN npm ci
+RUN npm install
 
 # Copiar código fonte (excluindo node_modules via .dockerignore)
 COPY . .
