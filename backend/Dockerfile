@@ -18,8 +18,16 @@ COPY . .
 # Criar diretório de uploads se não existir
 RUN mkdir -p /app/uploads
 
-# Build do TypeScript
-RUN npm run build
+# Build do TypeScript com output detalhado para debug
+RUN echo "Starting TypeScript build..." && \
+    npm run build 2>&1 | tee /tmp/build.log || \
+    (echo "=== Build failed! Showing errors ===" && \
+     cat /tmp/build.log && \
+     echo "=== TypeScript version ===" && \
+     npx tsc --version && \
+     echo "=== Checking tsconfig.json ===" && \
+     cat tsconfig.json && \
+     exit 1)
 
 # Expor porta
 EXPOSE 8081
