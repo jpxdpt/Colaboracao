@@ -3,7 +3,7 @@ FROM node:20
 WORKDIR /app
 
 # Instalar wget para healthcheck
-RUN apk add --no-cache wget
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
 # Copiar ficheiros de dependências
 COPY package*.json ./
