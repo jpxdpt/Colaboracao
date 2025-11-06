@@ -24,19 +24,27 @@ Após iniciar os containers, as seguintes URLs estarão disponíveis:
 
 ```env
 # URL da API para o frontend (usado durante o build)
-# Para comunicação interna do Docker, use: http://backend:8081/api
-# Para acesso externo via LocalTunnel, use: https://kanbar-dashboard-api.loca.lt/api
-VITE_API_URL=http://backend:8081/api
+# IMPORTANTE: Deve ser acessível do navegador, não um nome de serviço Docker
+# Para desenvolvimento local: http://localhost:8081/api
+# Para acesso externo via LocalTunnel: https://kanbar-dashboard-api.loca.lt/api
+# Para produção: https://api.seu-dominio.com/api
+VITE_API_URL=http://localhost:8081/api
 
 # URL do frontend para o backend (usado para CORS)
-# Para acesso externo via LocalTunnel, use: https://kanbar-dashboard.loca.lt
+# Para desenvolvimento local: http://localhost
+# Para acesso externo via LocalTunnel: https://kanbar-dashboard.loca.lt
+# Para produção: https://seu-dominio.com
 FRONTEND_URL=http://localhost
 
 # Secret JWT para autenticação (ALTERE EM PRODUÇÃO!)
-JWT_SECRET=your-super-secret-jwt-key-change-this
+# Use um valor seguro e único
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 ```
 
-**Nota**: Se estiveres a usar LocalTunnel para acesso público, deves definir `VITE_API_URL` como a URL pública do backend (ex: `https://kanbar-dashboard-api.loca.lt/api`) antes de fazer o build. Para comunicação interna entre containers Docker, usa `http://backend:8081/api`.
+**Nota**: 
+- `VITE_API_URL` deve ser acessível do navegador do utilizador, não um nome de serviço Docker interno
+- Se estiveres a usar LocalTunnel para acesso público, deves definir `VITE_API_URL` como a URL pública do backend (ex: `https://kanbar-dashboard-api.loca.lt/api`) antes de fazer o build
+- Para desenvolvimento local, usa `http://localhost:8081/api`
 
 2. **Build e iniciar os containers**:
 

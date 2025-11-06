@@ -2,12 +2,27 @@
 
 ## Início Rápido
 
-### 1. Iniciar containers Docker
+### 1. Configurar Variáveis de Ambiente (IMPORTANTE)
+
+Crie um ficheiro `.env` na raiz do projeto ou configure no Portainer:
+
+```env
+JWT_SECRET=seu-secret-jwt-muito-seguro-aqui
+FRONTEND_URL=http://localhost
+VITE_API_URL=http://localhost:8081/api
+```
+
+**⚠️ IMPORTANTE**: 
+- `VITE_API_URL` deve ser acessível do navegador (não use nomes de serviços Docker)
+- `JWT_SECRET` deve ser alterado em produção
+- Ver `ENV_VARIABLES.md` para mais detalhes
+
+### 2. Iniciar containers Docker
 ```bash
 docker-compose up -d --build
 ```
 
-### 2. Iniciar LocalTunnel (em terminal separado)
+### 3. Iniciar LocalTunnel (em terminal separado)
 
 **Windows:**
 ```powershell
@@ -20,7 +35,7 @@ chmod +x start-tunnels.sh
 ./start-tunnels.sh
 ```
 
-### 3. Aceder à aplicação
+### 4. Aceder à aplicação
 
 - **Local**: http://localhost
 - **Público**: https://kanbar-dashboard.loca.lt

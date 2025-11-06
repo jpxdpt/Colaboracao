@@ -15,6 +15,9 @@ RUN npm install
 # Copiar código fonte (excluindo node_modules e dist via .dockerignore)
 COPY . .
 
+# Criar diretório de uploads se não existir
+RUN mkdir -p /app/uploads
+
 # Build do TypeScript
 RUN npm run build
 
