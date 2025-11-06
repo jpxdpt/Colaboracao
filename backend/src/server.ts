@@ -11,9 +11,14 @@ import commentRoutes from './routes/comment.routes.js';
 import tagRoutes from './routes/tag.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import templateRoutes from './routes/template.routes.js';
+import attachmentRoutes from './routes/attachment.routes.js';
+import reportRoutes from './routes/report.routes.js';
+import timeEntryRoutes from './routes/timeEntry.routes.js';
+import apiDocsRoutes from './routes/api-docs.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authenticateToken } from './middleware/auth.js';
 import { connectDB } from './db/connection.js';
+import path from 'path';
 
 dotenv.config();
 
@@ -38,6 +43,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Servir ficheiros estáticos (uploads)
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // Conectar ao MongoDB
 connectDB().catch((err) => {
   console.error('Erro ao conectar ao MongoDB:', err);
@@ -56,6 +64,7 @@ app.get('/health', async (req, res) => {
 });
 
 // Routes
+app.use('/api/docs', apiDocsRoutes); // Documentação da API (sem autenticação)
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', authenticateToken, taskRoutes);
 app.use('/api/users', authenticateToken, userRoutes);
@@ -63,6 +72,9 @@ app.use('/api/comments', authenticateToken, commentRoutes);
 app.use('/api/tags', authenticateToken, tagRoutes);
 app.use('/api/notifications', authenticateToken, notificationRoutes);
 app.use('/api/templates', authenticateToken, templateRoutes);
+app.use('/api/attachments', attachmentRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/time-entries', authenticateToken, timeEntryRoutes);
 
 // Error handler
 app.use(errorHandler);

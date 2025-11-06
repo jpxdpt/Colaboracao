@@ -2,8 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import AdminDashboard from './pages/AdminDashboard';
-import UserDashboard from './pages/UserDashboard';
+import Layout from './components/Layout';
+import DashboardPage from './pages/DashboardPage';
+import TasksPage from './pages/TasksPage';
+import UsersPage from './pages/UsersPage';
+import ReportsPage from './pages/ReportsPage';
+import SettingsPage from './pages/SettingsPage';
+import NotificationsPage from './pages/NotificationsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function AppRoutes() {
@@ -19,23 +24,53 @@ function AppRoutes() {
         path="/register"
         element={isAuthenticated ? <Navigate to={isAdmin ? '/admin' : '/user'} /> : <Register />}
       />
+      
+      {/* Admin Routes */}
       <Route
         path="/admin"
         element={
           <ProtectedRoute requireAdmin>
-            <AdminDashboard />
+            <Layout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="tarefas" element={<Navigate to="/admin/tarefas/kanban" replace />} />
+        <Route path="tarefas/kanban" element={<TasksPage />} />
+        <Route path="tarefas/calendario" element={<TasksPage />} />
+        <Route path="tarefas/gantt" element={<TasksPage />} />
+        <Route path="utilizadores" element={<UsersPage />} />
+        <Route path="relatorios" element={<ReportsPage />} />
+        <Route path="notificacoes" element={<NotificationsPage />} />
+        <Route path="configuracoes" element={<SettingsPage />} />
+      </Route>
+
+      {/* User Routes */}
       <Route
         path="/user"
         element={
           <ProtectedRoute>
-            <UserDashboard />
+            <Layout />
           </ProtectedRoute>
         }
+      >
+        <Route index element={<Navigate to="/user/dashboard" replace />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="tarefas" element={<Navigate to="/user/tarefas/kanban" replace />} />
+        <Route path="tarefas/kanban" element={<TasksPage />} />
+        <Route path="tarefas/calendario" element={<TasksPage />} />
+        <Route path="tarefas/gantt" element={<TasksPage />} />
+        <Route path="notificacoes" element={<NotificationsPage />} />
+        <Route path="configuracoes" element={<SettingsPage />} />
+      </Route>
+
+      <Route
+        path="/"
+        element={
+          <Navigate to={isAuthenticated ? (isAdmin ? '/admin' : '/user') : '/login'} replace />
+        }
       />
-      <Route path="/" element={<Navigate to={isAuthenticated ? (isAdmin ? '/admin' : '/user') : '/login'} />} />
     </Routes>
   );
 }
@@ -56,4 +91,3 @@ function App() {
 }
 
 export default App;
-

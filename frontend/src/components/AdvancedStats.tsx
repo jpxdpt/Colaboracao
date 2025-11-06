@@ -1,12 +1,14 @@
-import { TaskWithRelations } from '../types';
+import { TaskWithRelations, User } from '../types';
 import { format, subDays, startOfDay } from 'date-fns';
 import { pt } from 'date-fns/locale/pt';
 
 interface AdvancedStatsProps {
   tasks: TaskWithRelations[];
+  users?: User[];
+  isAdmin?: boolean;
 }
 
-const AdvancedStats = ({ tasks }: AdvancedStatsProps) => {
+const AdvancedStats = ({ tasks, users = [], isAdmin = false }: AdvancedStatsProps) => {
   const completedTasks = tasks.filter((t) => t.status === 'completed');
   const overdueTasks = tasks.filter(
     (t) => t.deadline && new Date(t.deadline) < new Date() && t.status !== 'completed'

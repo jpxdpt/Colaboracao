@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { TaskWithRelations, User, Tag, ActivityLog } from '../types';
+import { TaskWithRelations, User, Tag, ActivityLog, Attachment } from '../types';
 import { taskService } from '../services/taskService';
 import { commentService } from '../services/commentService';
 import { tagService } from '../services/tagService';
+import { attachmentService } from '../services/attachmentService';
+import TimeTracker from './TimeTracker';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale/pt';
@@ -18,6 +20,11 @@ import {
   History,
   CheckSquare,
   Plus,
+  Paperclip,
+  Download,
+  File,
+  Image as ImageIcon,
+  Clock,
 } from 'lucide-react';
 
 interface TaskModalProps {
@@ -45,10 +52,12 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [newComment, setNewComment] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'history' | 'subtasks'>(
+  const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'history' | 'subtasks' | 'attachments' | 'time'>(
     'details'
   );
   const [subtasks, setSubtasks] = useState<TaskWithRelations[]>([]);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadAvailableTags();
@@ -64,6 +73,7 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
       setActivityLogs(task.activity_logs || []);
       setSubtasks(task.subtasks || []);
       loadComments();
+      loadAttachments();
     } else {
       setTitle('');
       setDescription('');
@@ -75,6 +85,7 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
       setTags([]);
       setActivityLogs([]);
       setSubtasks([]);
+      setAttachments([]);
     }
   }, [task]);
 
@@ -95,6 +106,81 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
     } catch (error) {
       console.error('Error loading comments:', error);
     }
+  };
+
+  const loadAttachments = async () => {
+    if (!task) return;
+    try {
+      const attachmentsData = await attachmentService.getAttachments(task.id);
+      setAttachments(attachmentsData);
+    } catch (error) {
+      console.error('Error loading attachments:', error);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!task || !e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
+    setUploading(true);
+
+    try {
+      await attachmentService.uploadAttachment(task.id, file);
+      await loadAttachments();
+      // Recarregar atividade
+      if (task) {
+        const updatedTask = await taskService.getTask(task.id);
+        setActivityLogs(updatedTask.activity_logs || []);
+      }
+      // Limpar input
+      e.target.value = '';
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('Erro ao fazer upload do ficheiro. Verifique o tamanho (máx. 10MB) e tente novamente.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDownload = async (attachment: Attachment) => {
+    try {
+      const blob = await attachmentService.downloadAttachment(attachment.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = attachment.original_filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      alert('Erro ao descarregar o ficheiro.');
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    if (!confirm('Tem a certeza que deseja eliminar este anexo?')) return;
+
+    try {
+      await attachmentService.deleteAttachment(attachmentId);
+      await loadAttachments();
+      // Recarregar atividade
+      if (task) {
+        const updatedTask = await taskService.getTask(task.id);
+        setActivityLogs(updatedTask.activity_logs || []);
+      }
+    } catch (error) {
+      console.error('Error deleting attachment:', error);
+      alert('Erro ao eliminar o anexo.');
+    }
+  };
+
+  const getFileIcon = (mimeType: string) => {
+    if (mimeType.startsWith('image/')) {
+      return <ImageIcon className="w-4 h-4" />;
+    }
+    return <File className="w-4 h-4" />;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -270,7 +356,7 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
               className={`py-3 px-2 border-b-2 transition-colors relative ${
                 activeTab === 'subtasks'
                   ? 'border-primary-600 text-primary-600 font-medium'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
               <CheckSquare className="w-4 h-4 inline mr-1" />
@@ -280,6 +366,33 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
                   {subtasks.length}
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => setActiveTab('attachments')}
+              className={`py-3 px-2 border-b-2 transition-colors relative ${
+                activeTab === 'attachments'
+                  ? 'border-primary-600 text-primary-600 font-medium'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <Paperclip className="w-4 h-4 inline mr-1" />
+              Anexos
+              {attachments.length > 0 && (
+                <span className="ml-2 bg-primary-100 text-primary-600 text-xs px-2 py-0.5 rounded-full">
+                  {attachments.length}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('time')}
+              className={`py-3 px-2 border-b-2 transition-colors ${
+                activeTab === 'time'
+                  ? 'border-primary-600 text-primary-600 font-medium'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <Clock className="w-4 h-4 inline mr-1" />
+              Tempo
             </button>
           </div>
         )}
@@ -614,7 +727,7 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
           {activeTab === 'subtasks' && task && (
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Subtarefas</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Subtarefas</h3>
                 {isAdmin && (
                   <button
                     onClick={handleCreateSubtask}
@@ -627,14 +740,14 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
               </div>
               <div className="space-y-2">
                 {subtasks.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-8">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
                     Nenhuma subtarefa criada
                   </p>
                 ) : (
                   subtasks.map((subtask) => (
                     <div
                       key={subtask.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                     >
                       <div className="flex items-center gap-3">
                         <CheckSquare
@@ -645,9 +758,9 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
                           }`}
                         />
                         <span
-                          className={
-                            subtask.status === 'completed' ? 'line-through text-gray-500' : ''
-                          }
+                          className={`${
+                            subtask.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'
+                          }`}
                         >
                           {subtask.title}
                         </span>
@@ -671,6 +784,118 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
                   ))
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Anexos */}
+          {task && activeTab === 'attachments' && (
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Anexos</h3>
+                </div>
+              </div>
+
+              {/* Upload de ficheiro */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Adicionar Anexo
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="btn btn-secondary flex items-center gap-2 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    {uploading ? 'A carregar...' : 'Selecionar Ficheiro'}
+                  </label>
+                  {uploading && (
+                    <div className="text-sm text-gray-500 dark:text-gray-400">A carregar...</div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Tamanho máximo: 10MB
+                </p>
+              </div>
+
+              {/* Lista de anexos */}
+              <div className="space-y-3">
+                {attachments.length === 0 ? (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
+                    Nenhum anexo adicionado
+                  </p>
+                ) : (
+                  attachments.map((attachment) => {
+                    const isImage = attachment.mime_type.startsWith('image/');
+                    const isPdf = attachment.mime_type === 'application/pdf';
+                    const fileUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8081'}${attachment.download_url}`;
+
+                    return (
+                      <div
+                        key={attachment.id}
+                        className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        <div className="flex-shrink-0">
+                          {isImage ? (
+                            <ImageIcon className="w-8 h-8 text-blue-500" />
+                          ) : isPdf ? (
+                            <File className="w-8 h-8 text-red-500" />
+                          ) : (
+                            <File className="w-8 h-8 text-gray-500" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                            {attachment.original_filename}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {attachmentService.formatFileSize(attachment.file_size)} •{' '}
+                            {format(new Date(attachment.created_at), "d 'de' MMM 'às' HH:mm", {
+                              locale: pt,
+                            })}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Adicionado por {attachment.user_name}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleDownload(attachment)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900 rounded transition-colors"
+                            title="Descarregar"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
+                          {(isAdmin || attachment.user_id === user?.id) && (
+                            <button
+                              onClick={() => handleDeleteAttachment(attachment.id)}
+                              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded transition-colors"
+                              title="Eliminar"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Time Tracker */}
+          {task && activeTab === 'time' && (
+            <div className="p-6">
+              <TimeTracker taskId={task.id} onUpdate={onSave} />
             </div>
           )}
         </div>

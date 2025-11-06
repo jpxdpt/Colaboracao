@@ -6,8 +6,8 @@ import { format } from 'date-fns';
 import { pt } from 'date-fns/locale/pt';
 
 interface UserManagementProps {
-  onClose: () => void;
-  onUpdate: () => void;
+  onClose?: () => void;
+  onUpdate?: () => void;
 }
 
 const UserManagement = ({ onClose, onUpdate }: UserManagementProps) => {
@@ -39,7 +39,7 @@ const UserManagement = ({ onClose, onUpdate }: UserManagementProps) => {
     try {
       await userService.updateUserRole(userId, newRole);
       loadData();
-      onUpdate();
+      onUpdate?.();
     } catch (error) {
       console.error('Error updating role:', error);
       alert('Erro ao atualizar role do utilizador');
@@ -54,17 +54,21 @@ const UserManagement = ({ onClose, onUpdate }: UserManagementProps) => {
     try {
       await userService.deleteUser(userId);
       loadData();
-      onUpdate();
+      onUpdate?.();
     } catch (error: any) {
       console.error('Error deleting user:', error);
       alert(error.response?.data?.error || 'Erro ao eliminar utilizador');
     }
   };
 
+  // Só é modal se onClose for explicitamente passado (não undefined)
+  // Se onClose for undefined, renderiza como página normal
+  const isModal = onClose !== undefined;
+
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-8">
+      <div className={`${isModal ? 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50' : 'flex items-center justify-center h-64'}`}>
+        <div className={`${isModal ? 'bg-white rounded-lg p-8' : ''}`}>
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       </div>
@@ -72,19 +76,21 @@ const UserManagement = ({ onClose, onUpdate }: UserManagementProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gestão de Utilizadores</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <div className={isModal ? 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4' : ''}>
+      <div className={`bg-white dark:bg-gray-800 rounded-lg ${isModal ? 'max-w-4xl w-full max-h-[90vh] overflow-y-auto' : 'w-full'}`}>
+        {isModal && (
+          <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Gestão de Utilizadores</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
 
-        <div className="p-6">
+        <div className={isModal ? 'p-6' : 'p-0'}>
           {/* Estatísticas */}
           {stats && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

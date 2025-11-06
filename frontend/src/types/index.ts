@@ -108,9 +108,36 @@ export interface TaskTemplate {
   created_at: string;
 }
 
+export interface Attachment {
+  id: string;
+  task_id: string;
+  user_id: string;
+  user_name: string;
+  filename: string;
+  original_filename: string;
+  file_size: number;
+  mime_type: string;
+  created_at: string;
+  download_url: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: User;
   message?: string;
+}
+
+export interface TimeEntry {
+  id: string;
+  task_id: string;
+  task_title: string;
+  user_id: string;
+  user_name: string;
+  start_time: string;
+  end_time: string | null;
+  duration: number; // em minutos
+  description: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
