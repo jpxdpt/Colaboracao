@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: kanbar-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: colaboracao
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - kanbar-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kanbar-backend
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=production
+      - PORT=8081
+      - MONGODB_URI=mongodb://mongodb:27017/colaboracao
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this}
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend/uploads:/app/uploads
+    networks:
+      - kanbar-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8081/api
+    container_name: kanbar-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - kanbar-network
+    environment:
+      - VITE_API_URL=http://localhost:8081/api
+
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+    kanbar-network:
+      driver: bridge
+
