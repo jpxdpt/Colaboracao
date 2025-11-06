@@ -2,6 +2,7 @@ node_modules
 dist
 .env
 .env.local
+.env.*.local
 *.log
 .git
 .gitignore
@@ -9,4 +10,12 @@ README.md
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.DS_Store
+.vscode
+.idea
+coverage
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
 

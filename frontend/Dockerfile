@@ -6,13 +6,13 @@ WORKDIR /app
 ARG VITE_API_URL=http://localhost:8081/api
 ENV VITE_API_URL=$VITE_API_URL
 
-# Copiar ficheiros de dependências
+# Copiar apenas ficheiros de dependências primeiro (para cache de layers)
 COPY package*.json ./
 
-# Instalar dependências
-RUN npm install
+# Instalar dependências (incluindo devDependencies para o build)
+RUN npm ci
 
-# Copiar código fonte
+# Copiar código fonte (excluindo node_modules via .dockerignore)
 COPY . .
 
 # Build da aplicação
