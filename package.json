@@ -8,9 +8,9 @@
     "frontend"
   ],
   "scripts": {
-    "dev": "pnpm --filter backend dev & pnpm --filter frontend dev",
-    "build": "pnpm --filter backend build && pnpm --filter frontend build",
-    "install:all": "pnpm install"
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "install:all": "npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

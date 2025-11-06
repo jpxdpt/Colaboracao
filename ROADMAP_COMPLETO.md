@@ -200,11 +200,11 @@
 ```bash
 # Backend
 cd backend
-npm install  # ou pnpm install
+npm install
 
 # Frontend
 cd frontend
-npm install  # ou pnpm install
+npm install
 ```
 
 ### 2. Iniciar Servidor
@@ -212,11 +212,11 @@ npm install  # ou pnpm install
 ```bash
 # Backend
 cd backend
-npm run dev  # ou pnpm dev
+npm run dev
 
 # Frontend
 cd frontend
-npm run dev  # ou pnpm dev
+npm run dev
 ```
 
 ### 3. Funcionalidades Disponíveis

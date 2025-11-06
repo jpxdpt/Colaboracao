@@ -9,8 +9,6 @@ Após adicionar as novas funcionalidades, é necessário instalar as dependênci
 ```bash
 cd backend
 npm install
-# ou
-pnpm install
 ```
 
 **Dependências adicionadas:**
@@ -23,8 +21,6 @@ pnpm install
 ```bash
 cd frontend
 npm install
-# ou
-pnpm install
 ```
 
 **Dependências adicionadas:**
