@@ -41,9 +41,15 @@ router.post(
       const user = req.user!;
 
       // Verificar permissões
+      const assignedToArray = Array.isArray(task.assigned_to) 
+        ? task.assigned_to.map((id: any) => String(id))
+        : task.assigned_to 
+          ? [String(task.assigned_to)] 
+          : [];
+      
       if (
         user.role !== 'admin' &&
-        task.assigned_to?.toString() !== user_id &&
+        !assignedToArray.includes(user_id) &&
         task.created_by.toString() !== user_id
       ) {
         return res.status(403).json({
@@ -66,30 +72,35 @@ router.post(
         newValue: content,
       });
 
-      // Notificar responsável pela tarefa
-      if (task.assigned_to && task.assigned_to.toString() !== user_id) {
-        await Notification.create({
-          user_id: task.assigned_to,
-          task_id: new Types.ObjectId(task_id),
-          type: 'comment_added',
-          title: 'Novo Comentário',
-          message: `Novo comentário na tarefa: ${task.title}`,
-        });
-      }
-
       const populatedComment = await Comment.findById(comment._id)
         .populate('user_id', 'name email')
         .lean();
 
+      // Notificar responsáveis pela tarefa
+      if (assignedToArray.length > 0) {
+        for (const assignedUserId of assignedToArray) {
+          if (assignedUserId !== user_id) {
+            await Notification.create({
+              user_id: assignedUserId,
+              task_id: new Types.ObjectId(task_id),
+              type: 'comment_added',
+              title: 'Novo Comentário',
+              message: `Novo comentário na tarefa: ${task.title}`,
+            });
+
+            if (io) {
+              io.to(`user-${assignedUserId}`).emit('task-comment', {
+                task_id,
+                comment: populatedComment,
+              });
+            }
+          }
+        }
+      }
+
       // Notificar via Socket.io
       if (io) {
         io.to(`task-${task_id}`).emit('new-comment', populatedComment);
-        if (task.assigned_to) {
-          io.to(`user-${task.assigned_to.toString()}`).emit('task-comment', {
-            task_id,
-            comment: populatedComment,
-          });
-        }
       }
 
       res.status(201).json({
@@ -128,9 +139,15 @@ router.get('/task/:task_id', async (req: AuthRequest, res: Response) => {
     }
 
     // Verificar permissões
+    const assignedToArray = Array.isArray(task.assigned_to) 
+      ? task.assigned_to.map((id: any) => String(id))
+      : task.assigned_to 
+        ? [String(task.assigned_to)] 
+        : [];
+    
     if (
       user.role !== 'admin' &&
-      task.assigned_to?.toString() !== user.userId &&
+      !assignedToArray.includes(user.userId) &&
       task.created_by.toString() !== user.userId
     ) {
       return res.status(403).json({ error: 'Acesso negado' });
@@ -147,8 +164,8 @@ router.get('/task/:task_id', async (req: AuthRequest, res: Response) => {
       user_id: c.user_id._id.toString(),
       content: c.content,
       created_at: c.created_at,
-      user_name: c.user_id.name,
-      user_email: c.user_id.email,
+      user_name: (c.user_id as any).name,
+      user_email: (c.user_id as any).email,
     }));
 
     res.json({ comments: formattedComments });

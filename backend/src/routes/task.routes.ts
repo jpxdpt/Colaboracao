@@ -615,7 +615,7 @@ router.delete('/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
 
     // Log antes de eliminar
     await logActivity({
-      taskId: task._id,
+      taskId: String(task._id),
       userId: user.userId,
       action: 'deleted',
     });
