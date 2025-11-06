@@ -106,7 +106,11 @@ const TasksPage = () => {
     }
 
     if (filters.assignedTo) {
-      filtered = filtered.filter((task) => task.assigned_to === filters.assignedTo);
+      filtered = filtered.filter((task) => 
+        Array.isArray(task.assigned_to) 
+          ? task.assigned_to.includes(filters.assignedTo)
+          : task.assigned_to === filters.assignedTo
+      );
     }
 
     // Filtrar apenas tarefas do utilizador se não for admin

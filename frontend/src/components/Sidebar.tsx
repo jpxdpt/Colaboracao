@@ -248,7 +248,7 @@ const Sidebar = (props: SidebarProps) => {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            handleItemClick('settings');
+            handleItemClick('settings', false);
           }}
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
             currentView === 'settings'

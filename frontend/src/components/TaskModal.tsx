@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TaskWithRelations, User, Tag, ActivityLog, Attachment } from '../types';
+import { TaskWithRelations, User, Tag, ActivityLog, Attachment, SubTask } from '../types';
 import { taskService } from '../services/taskService';
 import { commentService } from '../services/commentService';
 import { tagService } from '../services/tagService';
@@ -55,7 +55,7 @@ const TaskModal = ({ task, users = [], onClose, onSave, isAdmin }: TaskModalProp
   const [activeTab, setActiveTab] = useState<'details' | 'comments' | 'history' | 'subtasks' | 'attachments' | 'time'>(
     'details'
   );
-  const [subtasks, setSubtasks] = useState<TaskWithRelations[]>([]);
+  const [subtasks, setSubtasks] = useState<SubTask[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [uploading, setUploading] = useState(false);
 
