@@ -9,4 +9,9 @@ README.md
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
+.DS_Store
+.vscode
+.idea
+coverage
+uploads/*
+!uploads/.gitkeep
