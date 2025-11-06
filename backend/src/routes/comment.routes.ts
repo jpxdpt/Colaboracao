@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import Comment from '../models/Comment.js';
@@ -17,7 +17,7 @@ router.post(
     body('task_id').isString().withMessage('task_id é obrigatório'),
     body('content').trim().notEmpty().withMessage('Conteúdo do comentário é obrigatório'),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -99,8 +99,8 @@ router.post(
           user_id: populatedComment!.user_id._id.toString(),
           content: populatedComment!.content,
           created_at: populatedComment!.created_at,
-          user_name: populatedComment!.user_id.name,
-          user_email: populatedComment!.user_id.email,
+          user_name: (populatedComment!.user_id as any).name,
+          user_email: (populatedComment!.user_id as any).email,
         },
       });
     } catch (error) {
@@ -111,7 +111,7 @@ router.post(
 );
 
 // GET /api/comments/task/:task_id - Obter comentários de uma tarefa
-router.get('/task/:task_id', async (req: AuthRequest, res) => {
+router.get('/task/:task_id', async (req: AuthRequest, res: Response) => {
   try {
     const task_id = req.params.task_id;
     const user = req.user!;
@@ -159,7 +159,7 @@ router.get('/task/:task_id', async (req: AuthRequest, res) => {
 });
 
 // DELETE /api/comments/:id - Eliminar comentário
-router.delete('/:id', async (req: AuthRequest, res) => {
+router.delete('/:id', async (req: AuthRequest, res: Response) => {
   try {
     const comment_id = req.params.id;
     const user = req.user!;

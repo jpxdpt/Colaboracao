@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { body, query, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import Task from '../models/Task.js';
@@ -22,7 +22,7 @@ router.get(
     query('search').optional().isString(),
     query('parent_task_id').optional().isString(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -109,14 +109,14 @@ router.get(
           created_by_user: task.created_by
             ? {
                 id: task.created_by._id.toString(),
-                name: task.created_by.name,
-                email: task.created_by.email,
+                name: (task.created_by as any).name,
+                email: (task.created_by as any).email,
               }
             : undefined,
           parent_task: task.parent_task_id
             ? {
                 id: task.parent_task_id._id.toString(),
-                title: task.parent_task_id.title,
+                title: (task.parent_task_id as any).title,
               }
             : undefined,
         };
@@ -131,7 +131,7 @@ router.get(
 );
 
 // GET /api/tasks/:id - Obter tarefa específica com histórico
-router.get('/:id', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const taskId = req.params.id;
     const user = req.user!;
@@ -153,8 +153,8 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res) => {
     // Verificar permissões
     if (
       user.role !== 'admin' &&
-      task.assigned_to?._id?.toString() !== user.userId &&
-      task.created_by._id.toString() !== user.userId
+      (task.assigned_to as any)?._id?.toString() !== user.userId &&
+      (task.created_by as any)._id.toString() !== user.userId
     ) {
       return res.status(403).json({ error: 'Acesso negado' });
     }
@@ -202,13 +202,13 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res) => {
         assigned_user: assignedUsers.length > 0 ? assignedUsers[0] : undefined, // Para compatibilidade
         created_by_user: {
           id: task.created_by._id.toString(),
-          name: task.created_by.name,
-          email: task.created_by.email,
+          name: (task.created_by as any).name,
+          email: (task.created_by as any).email,
         },
       parent_task: task.parent_task_id
         ? {
             id: task.parent_task_id._id.toString(),
-            title: task.parent_task_id.title,
+            title: (task.parent_task_id as any).title,
           }
         : undefined,
       comments: comments.map((c: any) => ({
@@ -217,8 +217,8 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res) => {
         user_id: c.user_id._id.toString(),
         content: c.content,
         created_at: c.created_at,
-        user_name: c.user_id.name,
-        user_email: c.user_id.email,
+        user_name: (c.user_id as any).name,
+        user_email: (c.user_id as any).email,
       })),
       activity_logs: activityLogs,
       subtasks: subtasks.map((st: any) => ({
@@ -256,7 +256,7 @@ router.post(
     body('tags').optional().isArray(),
     body('parent_task_id').optional().isString(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -315,7 +315,7 @@ router.post(
 
       // Log de atividade
       await logActivity({
-        taskId: task._id.toString(),
+        taskId: String(task._id),
         userId: created_by,
         action: 'created',
       });
@@ -375,8 +375,8 @@ router.post(
         assigned_user: assignedUsers.length > 0 ? assignedUsers[0] : undefined, // Para compatibilidade
         created_by_user: {
           id: populatedTask!.created_by._id.toString(),
-          name: populatedTask!.created_by.name,
-          email: populatedTask!.created_by.email,
+          name: (populatedTask!.created_by as any).name,
+          email: (populatedTask!.created_by as any).email,
         },
       };
 
@@ -407,7 +407,7 @@ router.put(
     body('start_date').optional().isISO8601(),
     body('tags').optional().isArray(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -430,9 +430,9 @@ router.put(
       // Verificar permissões
       if (user.role !== 'admin') {
         const assignedToArray = Array.isArray(existingTask.assigned_to) 
-          ? existingTask.assigned_to.map((id: any) => id.toString())
+          ? existingTask.assigned_to.map((id: any) => String(id))
           : existingTask.assigned_to 
-            ? [existingTask.assigned_to.toString()] 
+            ? [String(existingTask.assigned_to)] 
             : [];
         
         if (
@@ -501,9 +501,9 @@ router.put(
       const assignedChanged = updateData.assigned_to && 
         JSON.stringify(updateData.assigned_to.map((id: any) => id.toString()).sort()) !==
         JSON.stringify((Array.isArray(existingTask.assigned_to) 
-          ? existingTask.assigned_to.map((id: any) => id.toString())
+          ? existingTask.assigned_to.map((id: any) => String(id))
           : existingTask.assigned_to 
-            ? [existingTask.assigned_to.toString()] 
+            ? [String(existingTask.assigned_to)] 
             : []).sort());
 
       // Atualizar tarefa
@@ -513,7 +513,7 @@ router.put(
       // Log de atividades
       for (const [field, newValue] of Object.entries(updateData)) {
         await logActivity({
-          taskId: existingTask._id,
+          taskId: String(existingTask._id),
           userId: user.userId,
           action: statusChanged ? 'status_changed' : assignedChanged ? 'assigned' : 'updated',
           field,
@@ -525,7 +525,7 @@ router.put(
       // Notificações
       if (statusChanged && io) {
         io.emit('task-status-changed', {
-          taskId: existingTask._id.toString(),
+          taskId: String(existingTask._id),
           newStatus: updateData.status,
         });
       }
@@ -584,8 +584,8 @@ router.put(
         assigned_user: assignedUsers.length > 0 ? assignedUsers[0] : undefined,
         created_by_user: {
           id: updatedTask!.created_by._id.toString(),
-          name: updatedTask!.created_by.name,
-          email: updatedTask!.created_by.email,
+          name: (updatedTask!.created_by as any).name,
+          email: (updatedTask!.created_by as any).email,
         },
       };
 
@@ -598,7 +598,7 @@ router.put(
 );
 
 // DELETE /api/tasks/:id - Eliminar tarefa
-router.delete('/:id', requireAdmin, async (req: AuthRequest, res) => {
+router.delete('/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const taskId = req.params.id;
     const user = req.user!;

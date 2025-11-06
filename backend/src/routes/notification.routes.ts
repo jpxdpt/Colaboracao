@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { Types } from 'mongoose';
 import Notification from '../models/Notification.js';
 import { AuthRequest } from '../middleware/auth.js';
@@ -6,7 +6,7 @@ import { AuthRequest } from '../middleware/auth.js';
 const router = express.Router();
 
 // GET /api/notifications - Listar notificações do utilizador
-router.get('/', async (req: AuthRequest, res) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user!;
     const { unread_only } = req.query;
@@ -41,7 +41,7 @@ router.get('/', async (req: AuthRequest, res) => {
 });
 
 // GET /api/notifications/unread-count - Contar notificações não lidas
-router.get('/unread-count', async (req: AuthRequest, res) => {
+router.get('/unread-count', async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user!;
     const count = await Notification.countDocuments({
@@ -57,7 +57,7 @@ router.get('/unread-count', async (req: AuthRequest, res) => {
 });
 
 // PUT /api/notifications/:id/read - Marcar notificação como lida
-router.put('/:id/read', async (req: AuthRequest, res) => {
+router.put('/:id/read', async (req: AuthRequest, res: Response) => {
   try {
     const notificationId = req.params.id;
     const user = req.user!;
@@ -87,7 +87,7 @@ router.put('/:id/read', async (req: AuthRequest, res) => {
 });
 
 // PUT /api/notifications/read-all - Marcar todas como lidas
-router.put('/read-all', async (req: AuthRequest, res) => {
+router.put('/read-all', async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user!;
 

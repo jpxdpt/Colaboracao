@@ -155,7 +155,7 @@ router.post(
 );
 
 // Verificar token atual
-router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/me', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const user = await User.findById(req.user!.userId).select('-password_hash');
 

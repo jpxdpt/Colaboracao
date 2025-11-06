@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { query, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import User from '../models/User.js';
@@ -8,7 +8,7 @@ import { AuthRequest, requireAdmin } from '../middleware/auth.js';
 const router = express.Router();
 
 // GET /api/users - Listar todos os utilizadores (apenas admin)
-router.get('/', requireAdmin, async (req: AuthRequest, res) => {
+router.get('/', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const users = await User.find().select('-password_hash').sort({ created_at: -1 }).lean();
 
@@ -28,7 +28,7 @@ router.get('/', requireAdmin, async (req: AuthRequest, res) => {
 });
 
 // GET /api/users/stats - Estatísticas de utilizadores (apenas admin)
-router.get('/stats', requireAdmin, async (req: AuthRequest, res) => {
+router.get('/stats', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     // Estatísticas gerais
     const totalUsers = await User.countDocuments();
@@ -106,7 +106,7 @@ router.get('/stats', requireAdmin, async (req: AuthRequest, res) => {
 });
 
 // GET /api/users/:id - Obter utilizador específico
-router.get('/:id', requireAdmin, async (req: AuthRequest, res) => {
+router.get('/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.id;
 
@@ -122,7 +122,7 @@ router.get('/:id', requireAdmin, async (req: AuthRequest, res) => {
 
     res.json({
       user: {
-        id: user._id.toString(),
+        id: String(user._id),
         email: user.email,
         name: user.name,
         role: user.role,
@@ -136,7 +136,7 @@ router.get('/:id', requireAdmin, async (req: AuthRequest, res) => {
 });
 
 // PUT /api/users/:id/role - Alterar role do utilizador
-router.put('/:id/role', requireAdmin, async (req: AuthRequest, res) => {
+router.put('/:id/role', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.id;
     const { role } = req.body;
@@ -168,7 +168,7 @@ router.put('/:id/role', requireAdmin, async (req: AuthRequest, res) => {
 
     res.json({
       user: {
-        id: user._id.toString(),
+        id: String(user._id),
         email: user.email,
         name: user.name,
         role: user.role,
@@ -182,7 +182,7 @@ router.put('/:id/role', requireAdmin, async (req: AuthRequest, res) => {
 });
 
 // DELETE /api/users/:id - Eliminar utilizador
-router.delete('/:id', requireAdmin, async (req: AuthRequest, res) => {
+router.delete('/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.id;
 

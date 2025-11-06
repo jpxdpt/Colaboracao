@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -42,7 +42,7 @@ const upload = multer({
 });
 
 // GET /api/attachments/task/:taskId - Listar anexos de uma tarefa
-router.get('/task/:taskId', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/task/:taskId', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const taskId = req.params.taskId;
 
@@ -96,7 +96,7 @@ router.post(
   '/task/:taskId',
   authenticateToken,
   upload.single('file'),
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: 'Nenhum ficheiro enviado' });
@@ -178,7 +178,7 @@ router.post(
 );
 
 // GET /api/attachments/:id/download - Download de anexo
-router.get('/:id/download', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/:id/download', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const attachmentId = req.params.id;
 
@@ -220,7 +220,7 @@ router.get('/:id/download', authenticateToken, async (req: AuthRequest, res) => 
 });
 
 // DELETE /api/attachments/:id - Eliminar anexo
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res) => {
+router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const attachmentId = req.params.id;
     const user = req.user!;
@@ -254,7 +254,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res) => {
 
     // Log de atividade
     await logActivity({
-      taskId: task._id.toString(),
+      taskId: String(task._id),
       userId: user.userId,
       action: 'updated',
       field: 'attachment',

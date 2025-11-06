@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { query, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import Task from '../models/Task.js';
@@ -20,7 +20,7 @@ router.get(
     query('start_date').optional().isISO8601(),
     query('end_date').optional().isISO8601(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -100,7 +100,7 @@ router.get(
   [
     query('format').isIn(['pdf', 'excel']).withMessage('Formato deve ser pdf ou excel'),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {

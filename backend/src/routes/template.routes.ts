@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import TaskTemplate from '../models/TaskTemplate.js';
@@ -7,7 +7,7 @@ import { AuthRequest, requireAdmin } from '../middleware/auth.js';
 const router = express.Router();
 
 // GET /api/templates - Listar templates
-router.get('/', async (req: AuthRequest, res) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const templates = await TaskTemplate.find()
       .populate('created_by', 'name')
@@ -43,7 +43,7 @@ router.post(
     body('default_priority').optional().isIn(['low', 'medium', 'high']),
     body('default_tags').optional().isArray(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -73,7 +73,7 @@ router.post(
 );
 
 // DELETE /api/templates/:id - Eliminar template
-router.delete('/:id', requireAdmin, async (req: AuthRequest, res) => {
+router.delete('/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const templateId = req.params.id;
 

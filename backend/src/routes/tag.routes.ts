@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import Tag from '../models/Tag.js';
@@ -7,7 +7,7 @@ import { AuthRequest, requireAdmin } from '../middleware/auth.js';
 const router = express.Router();
 
 // GET /api/tags - Listar todas as tags
-router.get('/', async (req: AuthRequest, res) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     const tags = await Tag.find().populate('created_by', 'name').sort({ name: 1 }).lean();
 
@@ -34,7 +34,7 @@ router.post(
     body('name').trim().notEmpty().withMessage('Nome da tag é obrigatório'),
     body('color').optional().isString(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -68,7 +68,7 @@ router.post(
 );
 
 // DELETE /api/tags/:id - Eliminar tag
-router.delete('/:id', requireAdmin, async (req: AuthRequest, res) => {
+router.delete('/:id', requireAdmin, async (req: AuthRequest, res: Response) => {
   try {
     const tagId = req.params.id;
 

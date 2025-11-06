@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Response } from 'express';
 import { body, query, validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import TimeEntry from '../models/TimeEntry.js';
@@ -17,7 +17,7 @@ router.get(
     query('start_date').optional().isISO8601(),
     query('end_date').optional().isISO8601(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -88,7 +88,7 @@ router.post(
     body('end_time').optional().isISO8601(),
     body('description').optional().trim(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -156,7 +156,7 @@ router.put(
     body('end_time').optional().isISO8601(),
     body('description').optional().trim(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -220,7 +220,7 @@ router.put(
 );
 
 // DELETE /api/time-entries/:id - Eliminar entrada de tempo
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res) => {
+router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const entryId = req.params.id;
     const user = req.user!;
@@ -249,7 +249,7 @@ router.delete('/:id', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 // GET /api/time-entries/task/:taskId/summary - Resumo de tempo por tarefa
-router.get('/task/:taskId/summary', authenticateToken, async (req: AuthRequest, res) => {
+router.get('/task/:taskId/summary', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const taskId = req.params.taskId;
     const user = req.user!;
