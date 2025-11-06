@@ -95,7 +95,7 @@ router.get(
           title: task.title,
           description: task.description,
           assigned_to: assignedUsers.map((u: any) => u.id),
-          created_by: task.created_by._id.toString(),
+          created_by: (task.created_by as any)._id.toString(),
           status: task.status,
           priority: task.priority,
           deadline: task.deadline || null,
@@ -108,7 +108,7 @@ router.get(
           assigned_user: assignedUsers.length > 0 ? assignedUsers[0] : undefined, // Para compatibilidade
           created_by_user: task.created_by
             ? {
-                id: task.created_by._id.toString(),
+                id: (task.created_by as any)._id.toString(),
                 name: (task.created_by as any).name,
                 email: (task.created_by as any).email,
               }
@@ -189,7 +189,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         title: task.title,
         description: task.description,
         assigned_to: assignedUsers.map((u: any) => u.id),
-        created_by: task.created_by._id.toString(),
+        created_by: (task.created_by as any)._id.toString(),
         status: task.status,
         priority: task.priority,
         deadline: task.deadline || null,
@@ -201,7 +201,7 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         assigned_users: assignedUsers,
         assigned_user: assignedUsers.length > 0 ? assignedUsers[0] : undefined, // Para compatibilidade
         created_by_user: {
-          id: task.created_by._id.toString(),
+          id: (task.created_by as any)._id.toString(),
           name: (task.created_by as any).name,
           email: (task.created_by as any).email,
         },
@@ -226,7 +226,9 @@ router.get('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
         title: st.title,
         status: st.status,
         priority: st.priority,
-        assigned_to: st.assigned_to?._id?.toString() || null,
+        assigned_to: Array.isArray(st.assigned_to) && st.assigned_to.length > 0
+          ? (st.assigned_to[0] as any)?._id?.toString() || null
+          : (st.assigned_to as any)?._id?.toString() || null,
       })),
     };
 
@@ -362,7 +364,7 @@ router.post(
         title: populatedTask!.title,
         description: populatedTask!.description,
         assigned_to: assignedUsers.map((u: any) => u.id),
-        created_by: populatedTask!.created_by._id.toString(),
+        created_by: (populatedTask!.created_by as any)._id.toString(),
         status: populatedTask!.status,
         priority: populatedTask!.priority,
         deadline: populatedTask!.deadline || null,
@@ -374,7 +376,7 @@ router.post(
         assigned_users: assignedUsers,
         assigned_user: assignedUsers.length > 0 ? assignedUsers[0] : undefined, // Para compatibilidade
         created_by_user: {
-          id: populatedTask!.created_by._id.toString(),
+          id: (populatedTask!.created_by as any)._id.toString(),
           name: (populatedTask!.created_by as any).name,
           email: (populatedTask!.created_by as any).email,
         },
@@ -571,7 +573,7 @@ router.put(
         title: updatedTask!.title,
         description: updatedTask!.description,
         assigned_to: assignedUsers.map((u: any) => u.id),
-        created_by: updatedTask!.created_by._id.toString(),
+        created_by: (updatedTask!.created_by as any)._id.toString(),
         status: updatedTask!.status,
         priority: updatedTask!.priority,
         deadline: updatedTask!.deadline || null,
@@ -583,7 +585,7 @@ router.put(
         assigned_users: assignedUsers,
         assigned_user: assignedUsers.length > 0 ? assignedUsers[0] : undefined,
         created_by_user: {
-          id: updatedTask!.created_by._id.toString(),
+          id: (updatedTask!.created_by as any)._id.toString(),
           name: (updatedTask!.created_by as any).name,
           email: (updatedTask!.created_by as any).email,
         },

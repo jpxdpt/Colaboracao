@@ -22,7 +22,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       default_description: template.default_description,
       default_priority: template.default_priority,
       default_tags: template.default_tags || [],
-      created_by: template.created_by._id.toString(),
+      created_by: (template.created_by as any)._id.toString(),
       created_at: template.created_at,
     }));
 

@@ -15,7 +15,7 @@ router.get('/', async (req: AuthRequest, res: Response) => {
       id: tag._id.toString(),
       name: tag.name,
       color: tag.color,
-      created_by: tag.created_by._id.toString(),
+      created_by: (tag.created_by as any)._id.toString(),
       created_at: tag.created_at,
     }));
 
