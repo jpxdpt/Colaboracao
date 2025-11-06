@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 # Copiar ficheiros de dependências primeiro (para cache de layers)
 COPY package*.json ./
 
-# Instalar dependências (npm ci é mais rápido e determinístico)
-RUN npm ci
+# Instalar dependências
+RUN npm install
 
 # Copiar código fonte (excluindo node_modules e dist via .dockerignore)
 COPY . .
