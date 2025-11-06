@@ -5,8 +5,9 @@ WORKDIR /app
 # Instalar wget para healthcheck
 RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
-# Copiar ficheiros de dependências primeiro (para cache de layers)
+# Copiar ficheiros de configuração primeiro
 COPY package*.json ./
+COPY tsconfig.json ./
 
 # Instalar dependências
 RUN npm install
