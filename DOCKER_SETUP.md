@@ -23,9 +23,20 @@ Após iniciar os containers, as seguintes URLs estarão disponíveis:
 1. **Criar ficheiro `.env` na raiz do projeto** (opcional, para variáveis customizadas):
 
 ```env
+# URL da API para o frontend (usado durante o build)
+# Para comunicação interna do Docker, use: http://backend:8081/api
+# Para acesso externo via LocalTunnel, use: https://kanbar-dashboard-api.loca.lt/api
+VITE_API_URL=http://backend:8081/api
+
+# URL do frontend para o backend (usado para CORS)
+# Para acesso externo via LocalTunnel, use: https://kanbar-dashboard.loca.lt
+FRONTEND_URL=http://localhost
+
+# Secret JWT para autenticação (ALTERE EM PRODUÇÃO!)
 JWT_SECRET=your-super-secret-jwt-key-change-this
-MONGODB_URI=mongodb://mongodb:27017/colaboracao
 ```
+
+**Nota**: Se estiveres a usar LocalTunnel para acesso público, deves definir `VITE_API_URL` como a URL pública do backend (ex: `https://kanbar-dashboard-api.loca.lt/api`) antes de fazer o build. Para comunicação interna entre containers Docker, usa `http://backend:8081/api`.
 
 2. **Build e iniciar os containers**:
 
@@ -128,18 +139,18 @@ docker exec -it kanbar-mongodb mongosh
 
 ## Configuração do Frontend
 
-O frontend precisa conhecer a URL do backend. Após iniciar os containers, verifique a URL do backend no log do LocalTunnel:
+O frontend precisa conhecer a URL do backend. A URL é configurada durante o build através da variável `VITE_API_URL`:
+
+- **Para comunicação interna entre containers Docker**: `http://backend:8081/api` (padrão)
+- **Para acesso externo via LocalTunnel**: `https://kanbar-dashboard-api.loca.lt/api`
+
+Se precisares de alterar a URL após o build, deves reconstruir o container do frontend:
 
 ```bash
-docker-compose logs localtunnel-backend
+docker-compose up -d --build frontend
 ```
 
-Procure por uma linha como:
-```
-your url is: https://kanbar-dashboard-api.loca.lt
-```
-
-Depois, atualize a variável de ambiente `VITE_API_URL` no frontend (ou configure no código).
+**Importante**: A variável `VITE_API_URL` é incorporada no código JavaScript durante o build, por isso precisa ser definida antes de construir a imagem Docker.
 
 ## Criar Utilizador Admin
 
