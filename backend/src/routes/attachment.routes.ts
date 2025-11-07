@@ -10,31 +10,23 @@ import { logActivity } from '../utils/activityLogger.js';
 
 const router = express.Router();
 
-// Criar diretório de uploads se não existir (apenas se não estiver no Vercel)
+// Criar diretório de uploads se não existir
 const uploadsDir = path.join(process.cwd(), 'uploads');
-if (process.env.VERCEL !== '1' && !fs.existsSync(uploadsDir)) {
-  try {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  } catch (error) {
-    console.error('Erro ao criar diretório uploads:', error);
-  }
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 // Configurar multer
-// No Vercel, usar memória storage (sistema de ficheiros é read-only)
-// Em outros ambientes, usar disk storage
-const storage = process.env.VERCEL === '1' 
-  ? multer.memoryStorage()
-  : multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, uploadsDir);
-      },
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = path.extname(file.originalname);
-        cb(null, `file-${uniqueSuffix}${ext}`);
-      },
-    });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, `file-${uniqueSuffix}${ext}`);
+  },
+});
 
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Permitir todos os tipos de ficheiro
@@ -114,19 +106,15 @@ router.post(
       const user = req.user!;
 
       if (!Types.ObjectId.isValid(taskId)) {
-        // Limpar ficheiro se ID inválido (apenas se usar disk storage)
-        if (req.file.path && process.env.VERCEL !== '1') {
-          fs.unlinkSync(req.file.path);
-        }
+        // Limpar ficheiro se ID inválido
+        fs.unlinkSync(req.file.path);
         return res.status(400).json({ error: 'ID de tarefa inválido' });
       }
 
       // Verificar se a tarefa existe e se o utilizador tem acesso
       const task = await Task.findById(taskId);
       if (!task) {
-        if (req.file.path && process.env.VERCEL !== '1') {
-          fs.unlinkSync(req.file.path);
-        }
+        fs.unlinkSync(req.file.path);
         return res.status(404).json({ error: 'Tarefa não encontrada' });
       }
 
@@ -136,17 +124,8 @@ router.post(
       const isCreator = task.created_by.toString() === user.userId;
 
       if (!isAssigned && !isCreator && user.role !== 'admin') {
-        if (req.file.path && process.env.VERCEL !== '1') {
-          fs.unlinkSync(req.file.path);
-        }
+        fs.unlinkSync(req.file.path);
         return res.status(403).json({ error: 'Sem permissão para adicionar anexos a esta tarefa' });
-      }
-
-      // No Vercel, uploads não são suportados (sistema de ficheiros read-only)
-      if (process.env.VERCEL === '1') {
-        return res.status(501).json({ 
-          error: 'Uploads não são suportados no Vercel. Use um serviço externo como S3 ou Cloudinary.' 
-        });
       }
 
       // Criar registo do anexo
@@ -189,13 +168,9 @@ router.post(
       });
     } catch (error) {
       console.error('Upload attachment error:', error);
-      // Limpar ficheiro em caso de erro (apenas se usar disk storage)
-      if (req.file && req.file.path && process.env.VERCEL !== '1') {
-        try {
-          fs.unlinkSync(req.file.path);
-        } catch (unlinkError) {
-          console.error('Erro ao eliminar ficheiro:', unlinkError);
-        }
+      // Limpar ficheiro em caso de erro
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
       }
       res.status(500).json({ error: 'Erro ao fazer upload do anexo' });
     }
@@ -205,13 +180,6 @@ router.post(
 // GET /api/attachments/:id/download - Download de anexo
 router.get('/:id/download', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    // No Vercel, downloads não são suportados (sistema de ficheiros read-only)
-    if (process.env.VERCEL === '1') {
-      return res.status(501).json({ 
-        error: 'Downloads não são suportados no Vercel. Use um serviço externo como S3 ou Cloudinary.' 
-      });
-    }
-
     const attachmentId = req.params.id;
 
     if (!Types.ObjectId.isValid(attachmentId)) {
