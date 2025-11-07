@@ -24,13 +24,18 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  },
-});
+
+// Socket.io - apenas em ambiente não-serverless
+let io: Server | null = null;
+if (process.env.VERCEL !== '1') {
+  io = new Server(httpServer, {
+    cors: {
+      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      credentials: true,
+    },
+  });
+}
 
 const PORT = process.env.PORT || 8081;
 
@@ -49,7 +54,10 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // Conectar ao MongoDB
 connectDB().catch((err) => {
   console.error('Erro ao conectar ao MongoDB:', err);
-  process.exit(1);
+  // No Vercel, não fazer exit para não quebrar o deploy
+  if (process.env.VERCEL !== '1') {
+    process.exit(1);
+  }
 });
 
 // Health check
@@ -79,35 +87,49 @@ app.use('/api/time-entries', authenticateToken, timeEntryRoutes);
 // Error handler
 app.use(errorHandler);
 
-// Socket.io connection handling
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
-  if (token) {
-    // Token validation will be done in the connection handler
-    next();
-  } else {
-    next(new Error('Authentication error'));
-  }
-});
-
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-
-  socket.on('join-room', (room) => {
-    socket.join(room);
-    console.log(`User ${socket.id} joined room: ${room}`);
+// Socket.io connection handling - apenas se disponível
+if (io) {
+  io.use((socket, next) => {
+    const token = socket.handshake.auth.token;
+    if (token) {
+      // Token validation will be done in the connection handler
+      next();
+    } else {
+      next(new Error('Authentication error'));
+    }
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+  io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('join-room', (room) => {
+      socket.join(room);
+      console.log(`User ${socket.id} joined room: ${room}`);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
+    });
   });
-});
+}
 
 // Export io for use in routes
 export { io };
 
-httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 Socket.io ready for connections`);
-});
+// Iniciar servidor apenas em desenvolvimento/local
+// No Vercel, a app é exportada como serverless function
+if (process.env.VERCEL !== '1') {
+  httpServer.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    if (io) {
+      console.log(`📡 Socket.io ready for connections`);
+    }
+  });
+} else {
+  // No Vercel, Socket.io não funciona bem
+  console.log('Running on Vercel - Socket.io disabled');
+}
+
+// Exportar app para Vercel serverless
+export default app;
 
