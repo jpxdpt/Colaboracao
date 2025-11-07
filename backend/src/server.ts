@@ -75,6 +75,22 @@ app.get('/health', async (req, res) => {
   }
 });
 
+// Root endpoint - informação da API
+app.get('/', (req, res) => {
+  res.json({
+    message: 'API do Sistema de Colaboração',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      docs: '/api/docs',
+      auth: '/api/auth',
+      tasks: '/api/tasks',
+      users: '/api/users',
+    },
+    environment: process.env.VERCEL === '1' ? 'Vercel' : 'Local',
+  });
+});
+
 // Routes
 app.use('/api/docs', apiDocsRoutes); // Documentação da API (sem autenticação)
 app.use('/api/auth', authRoutes);
