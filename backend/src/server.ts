@@ -23,11 +23,13 @@ import path from 'path';
 dotenv.config();
 
 const app = express();
-const httpServer = createServer(app);
 
-// Socket.io - apenas em ambiente não-serverless
+// Socket.io e HTTP Server - apenas em ambiente não-serverless
+let httpServer: ReturnType<typeof createServer> | null = null;
 let io: Server | null = null;
+
 if (process.env.VERCEL !== '1') {
+  httpServer = createServer(app);
   io = new Server(httpServer, {
     cors: {
       origin: process.env.FRONTEND_URL || 'http://localhost:5173',
@@ -118,18 +120,19 @@ export { io };
 
 // Iniciar servidor apenas em desenvolvimento/local
 // No Vercel, a app é exportada como serverless function
-if (process.env.VERCEL !== '1') {
+if (process.env.VERCEL !== '1' && httpServer) {
   httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     if (io) {
       console.log(`📡 Socket.io ready for connections`);
     }
   });
-} else {
+} else if (process.env.VERCEL === '1') {
   // No Vercel, Socket.io não funciona bem
   console.log('Running on Vercel - Socket.io disabled');
 }
 
 // Exportar app para Vercel serverless
+// Quando compilado para CommonJS, export default vira exports.default
 export default app;
 
