@@ -50,8 +50,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir ficheiros estáticos (uploads)
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Servir ficheiros estáticos (uploads) - apenas se não estiver no Vercel
+if (process.env.VERCEL !== '1') {
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+}
 
 // Conectar ao MongoDB
 connectDB().catch((err) => {
