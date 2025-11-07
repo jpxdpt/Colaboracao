@@ -9,8 +9,12 @@ RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Instalar dependências
-RUN npm install
+# Instalar dependências com retry para lidar com problemas de rede
+RUN npm install --maxsockets 1 --fetch-retries 3 --fetch-retry-mintimeout 20000 || \
+    (echo "npm install failed - checking resources" && \
+     free -h && \
+     df -h && \
+     exit 1)
 
 # Copiar código fonte (excluindo node_modules e dist via .dockerignore)
 COPY . .
@@ -18,8 +22,16 @@ COPY . .
 # Criar diretório de uploads se não existir
 RUN mkdir -p /app/uploads
 
-# Build do TypeScript (Docker mostra output completo automaticamente)
-RUN npm run build || (echo "Build failed with errors above" && exit 1)
+# Build do TypeScript com diagnóstico detalhado
+RUN echo "=== Starting TypeScript build ===" && \
+    echo "TypeScript version:" && \
+    npx tsc --version && \
+    echo "Node version:" && \
+    node --version && \
+    echo "Checking source files:" && \
+    find src -name "*.ts" | head -5 && \
+    echo "Running build..." && \
+    npm run build
 
 # Expor porta
 EXPOSE 8081
