@@ -11,7 +11,7 @@ const logFormat = winston.format.combine(
 const logger = winston.createLogger({
   level: config.nodeEnv === 'production' ? 'info' : 'debug',
   format: logFormat,
-  defaultMeta: { service: 'gamify-backend' },
+  defaultMeta: { service: 'taskify-backend' },
   transports: [
     new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'logs/combined.log' }),
@@ -30,5 +30,12 @@ if (config.nodeEnv !== 'production') {
 }
 
 export { logger };
+
+/**
+ * Escapa caracteres especiais de regex para prevenir injeção
+ */
+export const escapeRegex = (string: string): string => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
 
 

@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { RankingType } from '@gamify/shared';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
+import { RankingType } from '@taskify/shared';
 
-export interface IRanking extends Document {
+export interface IRanking extends IBaseDocument {
   type: RankingType;
   periodStart: Date;
   periodEnd: Date;
@@ -62,4 +63,5 @@ RankingSchema.index({ type: 1, user: 1, periodStart: -1 });
 RankingSchema.index({ type: 1, department: 1, periodStart: -1, points: -1 });
 
 export const Ranking = mongoose.model<IRanking>('Ranking', RankingSchema);
+
 

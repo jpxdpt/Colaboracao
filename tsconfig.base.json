@@ -20,12 +20,14 @@
     "isolatedModules": true,
     "noEmit": false,
     "paths": {
-      "@shared/*": ["./packages/shared/src/*"],
       "@backend/*": ["./packages/backend/src/*"],
-      "@frontend/*": ["./packages/frontend/src/*"]
+      "@frontend/*": ["./packages/frontend/src/*"],
+      "@shared/*": ["./packages/shared/src/*"],
+      "@shared": ["./packages/shared/src"]
     }
   },
   "exclude": ["node_modules", "dist", "build", ".turbo"]
 }
+
 
 

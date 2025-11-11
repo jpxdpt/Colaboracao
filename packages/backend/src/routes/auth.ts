@@ -15,7 +15,7 @@ import {
 } from '../controllers/authController';
 import { authenticate, authorize } from '../middleware/auth';
 import expressRateLimit from 'express-rate-limit';
-import { UserRole } from '@gamify/shared';
+import { UserRole } from '@taskify/shared';
 
 const router = Router();
 

@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface ITraining extends Document {
+export interface ITraining extends IBaseDocument {
   title: string;
   description: string;
   category: string;
@@ -17,7 +18,7 @@ export interface ITraining extends Document {
   updatedAt: Date;
 }
 
-export interface ITrainingProgress extends Document {
+export interface ITrainingProgress extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   training: mongoose.Types.ObjectId;
   progress: number; // percentagem 0-100
@@ -159,4 +160,5 @@ export const TrainingProgress = mongoose.model<ITrainingProgress>(
   'TrainingProgress',
   TrainingProgressSchema
 );
+
 

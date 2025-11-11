@@ -33,6 +33,8 @@ export const taskFiltersSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']).optional(),
   dueDateFrom: z.string().datetime().optional(),
   dueDateTo: z.string().datetime().optional(),
+  parentTask: z.string().optional(),
+  includeSubtasks: z.coerce.boolean().optional(),
   page: z.number().int().min(1).default(1),
   limit: z.number().int().min(1).max(100).default(20),
   sortBy: z.enum(['dueDate', 'priority', 'createdAt']).default('createdAt'),

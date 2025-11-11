@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { TaskStatus } from '@gamify/shared';
+import { TaskStatus } from '@shared/constants/enums';
 import Card from '../ui/Card';
 import { CheckCircle2, Circle, Clock, Flag, ChevronDown, ChevronRight } from 'lucide-react';
 
@@ -26,7 +26,11 @@ interface KanbanViewProps {
   onStatusChange?: (taskId: string, newStatus: TaskStatus) => void;
 }
 
-const statusConfig = {
+const statusConfig: Record<TaskStatus, {
+  label: string;
+  icon: React.ElementType;
+  color: string;
+}> = {
   [TaskStatus.PENDING]: {
     label: 'Pendente',
     icon: Circle,
@@ -135,9 +139,9 @@ const getPriorityColor = (priority: string) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full overflow-x-auto pb-4">
-      {Object.values(TaskStatus).map((status) => {
-        const statusTasks = getTasksByStatus(status);
-        const config = statusConfig[status];
+      {(Object.values(TaskStatus) as TaskStatus[]).map((typedStatus) => {
+        const statusTasks = getTasksByStatus(typedStatus);
+        const config = statusConfig[typedStatus];
         
         // Pular se não houver configuração para este status
         if (!config) {
@@ -148,14 +152,14 @@ const getPriorityColor = (priority: string) => {
 
         return (
           <motion.div
-            key={status}
+            key={typedStatus}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col min-w-[300px]"
             onDragOver={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              handleDragOver(status, true);
+              handleDragOver(typedStatus, true);
               if (e.dataTransfer) {
                 e.dataTransfer.dropEffect = 'move';
               }
@@ -167,7 +171,7 @@ const getPriorityColor = (priority: string) => {
               const x = e.clientX;
               const y = e.clientY;
               if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-                handleDragOver(status, false);
+                handleDragOver(typedStatus, false);
               }
             }}
             onDrop={(e) => {
@@ -176,16 +180,16 @@ const getPriorityColor = (priority: string) => {
               const taskId = e.dataTransfer.getData('text/plain');
               if (taskId && onStatusChange) {
                 const task = findTaskById(taskId);
-                if (task && task.status !== status) {
-                  onStatusChange(taskId, status);
+                if (task && task.status !== typedStatus) {
+                  onStatusChange(taskId, typedStatus);
                 }
               }
-              handleDragOver(status, false);
+              handleDragOver(typedStatus, false);
             }}
           >
             <div
               className={`${config.color} rounded-lg p-4 mb-4 transition-all ${
-                dragOverColumn === status ? 'ring-2 ring-purple-500 ring-offset-2' : ''
+                dragOverColumn === typedStatus ? 'ring-2 ring-purple-500 ring-offset-2' : ''
               }`}
               role="region"
               aria-label={`Coluna ${config.label} com ${statusTasks.length} tarefas`}
@@ -204,7 +208,7 @@ const getPriorityColor = (priority: string) => {
               onDragOver={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                handleDragOver(status, true);
+                handleDragOver(typedStatus, true);
                 if (e.dataTransfer) {
                   e.dataTransfer.dropEffect = 'move';
                 }
@@ -214,7 +218,7 @@ const getPriorityColor = (priority: string) => {
                 const x = e.clientX;
                 const y = e.clientY;
                 if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-                  handleDragOver(status, false);
+                  handleDragOver(typedStatus, false);
                 }
               }}
               onDrop={(e) => {
@@ -223,22 +227,22 @@ const getPriorityColor = (priority: string) => {
                 const taskId = e.dataTransfer.getData('text/plain');
                 if (taskId && onStatusChange) {
                 const task = findTaskById(taskId);
-                  if (task && task.status !== status) {
-                    onStatusChange(taskId, status);
+                  if (task && task.status !== typedStatus) {
+                    onStatusChange(taskId, typedStatus);
                   }
                 }
-                handleDragOver(status, false);
+                handleDragOver(typedStatus, false);
               }}
             >
               {statusTasks.length === 0 ? (
                 <div
                   className={`text-center py-8 text-gray-400 dark:text-gray-500 text-sm rounded-lg border-2 border-dashed transition-all ${
-                    dragOverColumn === status
+                    dragOverColumn === typedStatus
                       ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  {dragOverColumn === status ? 'Solte aqui' : 'Nenhuma tarefa'}
+                  {dragOverColumn === typedStatus ? 'Solte aqui' : 'Nenhuma tarefa'}
                 </div>
               ) : (
                 statusTasks.map((task, index) => {
@@ -371,7 +375,7 @@ const getPriorityColor = (priority: string) => {
                         {/* Mostrar contador de subtarefas se for tarefa principal */}
                         {!isSubtask && task.subtasks && task.subtasks.length > 0 && (
                           <div className="mb-2 text-xs text-gray-500 dark:text-gray-400">
-                            {task.subtasks.filter((st) => st.status === status).length}/
+                            {task.subtasks.filter((st) => st.status === typedStatus).length}/
                             {task.subtasks.length} subtarefas nesta coluna
                           </div>
                         )}

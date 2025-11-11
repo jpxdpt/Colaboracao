@@ -1,11 +1,11 @@
 import { Response } from 'express';
 import { Task, User } from '../models';
-import { createTaskSchema, updateTaskSchema, taskFiltersSchema } from '@gamify/shared';
+import { createTaskSchema, updateTaskSchema, taskFiltersSchema } from '@taskify/shared';
 import { z } from 'zod';
 import { awardPoints, getPointsConfig } from '../services/gamificationService';
 import { updateStreak } from '../services/streakService';
 import { updateTeamChallengeProgress } from '../services/challengeService';
-import { TaskStatus } from '@gamify/shared';
+import { TaskStatus } from '@taskify/shared';
 import { AuthRequest } from '../middleware/auth';
 import { TeamMember } from '../models';
 
@@ -29,12 +29,15 @@ export const getTasks = async (req: AuthRequest, res: Response): Promise<void> =
       query.priority = filters.priority;
     }
     if (filters.dueDateFrom || filters.dueDateTo) {
-      query.dueDate = {};
+      const dueDateFilter: { $gte?: Date; $lte?: Date } = {};
       if (filters.dueDateFrom) {
-        query.dueDate.$gte = new Date(filters.dueDateFrom);
+        dueDateFilter.$gte = new Date(filters.dueDateFrom);
       }
       if (filters.dueDateTo) {
-        query.dueDate.$lte = new Date(filters.dueDateTo);
+        dueDateFilter.$lte = new Date(filters.dueDateTo);
+      }
+      if (Object.keys(dueDateFilter).length > 0) {
+        query.dueDate = dueDateFilter;
       }
     }
 

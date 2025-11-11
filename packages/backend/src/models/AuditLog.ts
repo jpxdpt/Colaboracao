@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IAuditLog extends Document {
+export interface IAuditLog extends IBaseDocument {
   action: string;
   userId?: string;
   resourceType: string;
@@ -51,11 +52,15 @@ const AuditLogSchema = new Schema<IAuditLog>(
   }
 );
 
-// Índice composto para queries frequentes
+// Índices compostos para queries frequentes
 AuditLogSchema.index({ userId: 1, createdAt: -1 });
 AuditLogSchema.index({ resourceType: 1, resourceId: 1 });
 AuditLogSchema.index({ action: 1, createdAt: -1 });
+AuditLogSchema.index({ userId: 1, action: 1, createdAt: -1 }); // Para auditoria por usuário
+AuditLogSchema.index({ resourceType: 1, createdAt: -1 }); // Para relatórios por tipo de recurso
+AuditLogSchema.index({ createdAt: -1 }); // Para listagem geral ordenada por data
 
 export const AuditLog = mongoose.model<IAuditLog>('AuditLog', AuditLogSchema);
+
 
 

@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { GoalType } from '@gamify/shared';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
+import { GoalType } from '@taskify/shared';
 
-export interface IGoal extends Document {
+export interface IGoal extends IBaseDocument {
   title: string;
   description?: string;
   type: GoalType;
@@ -99,4 +100,5 @@ GoalSchema.index({ status: 1, createdBy: 1 });
 GoalSchema.index({ type: 1, status: 1 });
 
 export const Goal = mongoose.model<IGoal>('Goal', GoalSchema);
+
 

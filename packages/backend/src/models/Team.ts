@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface ITeam extends Document {
+export interface ITeam extends IBaseDocument {
   name: string;
   description: string;
   avatar?: string;
@@ -13,7 +14,7 @@ export interface ITeam extends Document {
   updatedAt: Date;
 }
 
-export interface ITeamMember extends Document {
+export interface ITeamMember extends IBaseDocument {
   team: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   role: 'member' | 'leader';
@@ -114,7 +115,10 @@ const TeamMemberSchema = new Schema<ITeamMember>(
 
 TeamMemberSchema.index({ team: 1, user: 1 }, { unique: true });
 TeamMemberSchema.index({ user: 1, active: 1 });
+TeamMemberSchema.index({ team: 1, active: 1 }); // Para buscar membros ativos de uma equipe
+TeamMemberSchema.index({ user: 1, role: 1, active: 1 }); // Para buscar roles do usuário
 
 export const Team = mongoose.model<ITeam>('Team', TeamSchema);
 export const TeamMember = mongoose.model<ITeamMember>('TeamMember', TeamMemberSchema);
+
 

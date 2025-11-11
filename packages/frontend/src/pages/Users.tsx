@@ -27,7 +27,7 @@ import EmptyState from '../components/ui/EmptyState';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
-import { UserRole } from '@gamify/shared';
+import { UserRole } from '@shared';
 import toast from 'react-hot-toast';
 
 const getApiUrl = () => {

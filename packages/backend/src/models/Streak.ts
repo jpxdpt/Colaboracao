@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IStreak extends Document {
+export interface IStreak extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   type: string; // daily_tasks, training, reports, etc
   consecutiveDays: number;
@@ -60,4 +61,5 @@ StreakSchema.index({ user: 1, type: 1 }, { unique: true });
 StreakSchema.index({ user: 1, lastActivity: -1 });
 
 export const Streak = mongoose.model<IStreak>('Streak', StreakSchema);
+
 

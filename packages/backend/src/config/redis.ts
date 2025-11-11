@@ -1,4 +1,4 @@
-import Redis from 'ioredis';
+import Redis, { RedisOptions } from 'ioredis';
 import { config } from './index';
 import { logger } from '../utils/logger';
 
@@ -12,27 +12,29 @@ export const connectRedis = async (): Promise<Redis | null> => {
   try {
     // Se houver URL de conexão, usar ela (prioridade)
     // Caso contrário, usar host/port/password
-    const redisOptions = config.redis.url
-      ? config.redis.url
-      : {
-      host: config.redis.host,
-      port: config.redis.port,
-      password: config.redis.password,
-        };
-
-    redisClient = new Redis(redisOptions, {
+    const commonOptions: RedisOptions = {
       retryStrategy: (times) => {
-        // Stop retrying after 5 attempts
         if (times > 5) {
           logger.warn('Redis connection failed after 5 attempts. Continuing without Redis.');
           return null;
         }
-        const delay = Math.min(times * 50, 2000);
+        const delay = Math.min(times * 100, 2000);
         return delay;
       },
       maxRetriesPerRequest: 3,
       lazyConnect: true,
-    });
+    };
+
+    if (config.redis.url) {
+      redisClient = new Redis(config.redis.url, commonOptions);
+    } else {
+      redisClient = new Redis({
+        host: config.redis.host,
+        port: config.redis.port,
+        password: config.redis.password,
+        ...commonOptions,
+      });
+    }
 
     redisClient.on('connect', () => {
       logger.info('Redis connected');
@@ -53,6 +55,7 @@ export const connectRedis = async (): Promise<Redis | null> => {
       return redisClient;
     } catch (error) {
       logger.warn('Redis connection failed, continuing without Redis:', (error as Error).message);
+      redisClient.disconnect();
       redisClient = null;
       return null;
     }

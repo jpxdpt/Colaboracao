@@ -16,13 +16,13 @@ export class AppError extends Error {
 export const setupErrorHandling = (app: any): void => {
   // 404 handler
   app.use((req: Request, res: Response, next: NextFunction) => {
-    console.log('❌ 404 - Rota não encontrada:', {
+    logger.warn('404 - Rota não encontrada', {
       method: req.method,
       path: req.path,
       originalUrl: req.originalUrl,
-      headers: {
-        authorization: req.headers.authorization ? 'present' : 'missing'
-      }
+      hasAuth: !!req.headers.authorization,
+      ip: req.ip,
+      userAgent: req.get('user-agent')
     });
     const error = new AppError(`Route ${req.originalUrl} not found`, 404);
     next(error);

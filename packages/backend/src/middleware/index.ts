@@ -3,18 +3,22 @@ import cors from 'cors';
 import helmet from 'helmet';
 import expressRateLimit from 'express-rate-limit';
 import { config } from '../config';
+import { logger } from '../utils/logger';
 
 export const setupMiddleware = (app: Express): void => {
-  // Logging básico para debug
-  app.use((req, res, next) => {
-    console.log(`📥 ${req.method} ${req.path}`, {
-      headers: {
-        authorization: req.headers.authorization ? 'present' : 'missing',
-        origin: req.headers.origin
-      }
+  // Logging básico para debug (apenas em desenvolvimento)
+  if (process.env.NODE_ENV === 'development') {
+    app.use((req, res, next) => {
+      logger.debug(`Request recebida`, {
+        method: req.method,
+        path: req.path,
+        hasAuth: !!req.headers.authorization,
+        origin: req.headers.origin,
+        ip: req.ip
+      });
+      next();
     });
-    next();
-  });
+  }
 
   // Security
   app.use(
@@ -72,7 +76,9 @@ export const setupMiddleware = (app: Express): void => {
         }
 
         // Se não passou em nenhuma verificação, bloquear
-        console.warn(`🚫 CORS bloqueado para origem: ${origin}`);
+        logger.warn(`CORS bloqueado para origem não autorizada`, {
+          origin,
+        });
         callback(new Error('Not allowed by CORS'));
       },
       credentials: true,

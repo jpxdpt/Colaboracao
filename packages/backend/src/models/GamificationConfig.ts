@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IGamificationConfig extends Document {
+export interface IGamificationConfig extends IBaseDocument {
   department?: string; // null = global
   action: string; // task_completed, report_submitted, etc
   basePoints: number;
@@ -48,4 +49,5 @@ export const GamificationConfig = mongoose.model<IGamificationConfig>(
   'GamificationConfig',
   GamificationConfigSchema
 );
+
 

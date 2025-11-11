@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface ITeamMessage extends Document {
+export interface ITeamMessage extends IBaseDocument {
   team: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   content: string;
@@ -37,5 +38,6 @@ const TeamMessageSchema = new Schema<ITeamMessage>(
 TeamMessageSchema.index({ team: 1, createdAt: -1 });
 
 export const TeamMessage = mongoose.model<ITeamMessage>('TeamMessage', TeamMessageSchema);
+
 
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Award, TrendingUp, Crown, Star, User } from 'lucide-react';
+import { Trophy, Medal, TrendingUp, Crown, Star } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import Container from '../components/layout/Container';
 import Card from '../components/ui/Card';
@@ -8,7 +8,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
-import { RankingType } from '@gamify/shared';
+import { RankingType } from '@shared/constants/enums';
 
 interface RankingEntry {
   _id: string;
@@ -124,7 +124,7 @@ export default function Rankings() {
           className="mb-6"
         >
           <div className="flex gap-2 flex-wrap">
-            {Object.values(RankingType).map((type) => (
+            {(Object.values(RankingType) as RankingType[]).map((type: RankingType) => (
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}

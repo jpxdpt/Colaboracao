@@ -1,6 +1,7 @@
 import { Challenge, ChallengeTeamProgress, Team, TeamMember, User } from '../models';
 import { awardPoints } from './gamificationService';
 import { addTransaction } from './currencyService';
+import mongoose from 'mongoose';
 
 /**
  * Atualiza o progresso de uma equipa num desafio
@@ -165,14 +166,16 @@ export const distributeChallengeRewards = async (challengeId: string): Promise<v
     }
   } else {
     // Distribuir recompensas para utilizadores individuais
-    const userProgresses = await ChallengeProgress.find({
+    const userProgresses = await ChallengeTeamProgress.find({
       challenge: challengeId,
       completed: true,
     })
       .populate('user')
       .lean();
 
-    for (const userProgress of userProgresses) {
+    const typedUserProgresses = userProgresses as unknown as Array<{ user: mongoose.Types.ObjectId }>;
+
+    for (const userProgress of typedUserProgresses) {
       const userId = userProgress.user.toString();
 
       // Pontos

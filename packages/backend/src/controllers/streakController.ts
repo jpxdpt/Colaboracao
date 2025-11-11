@@ -50,7 +50,7 @@ export const getStreakByType = async (req: AuthRequest, res: Response): Promise<
     const atRisk = await isStreakAtRisk(userId, type);
 
     res.json({
-      ...streak.toObject(),
+      ...streak,
       atRisk,
     });
   } catch (error) {

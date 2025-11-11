@@ -1,4 +1,5 @@
-import { Streak } from '../models';
+import { HydratedDocument } from 'mongoose';
+import { Streak, IStreak } from '../models';
 import { awardPoints } from './gamificationService';
 
 /**
@@ -15,7 +16,7 @@ interface UpdateStreakParams {
  * Atualiza ou cria streak para um utilizador
  */
 export const updateStreak = async (params: UpdateStreakParams): Promise<{
-  streak: typeof Streak;
+  streak: HydratedDocument<IStreak>;
   isNewRecord: boolean;
   reward?: string;
 }> => {
@@ -146,15 +147,17 @@ const getMilestonePoints = (days: number): number => {
 export const getCurrentStreak = async (
   userId: string,
   type: string
-): Promise<typeof Streak | null> => {
-  return Streak.findOne({ user: userId, type });
+): Promise<(IStreak & { _id: string }) | null> => {
+  const result = await Streak.findOne({ user: userId, type }).lean();
+  return result as (IStreak & { _id: string }) | null;
 };
 
 /**
  * Busca todos os streaks do utilizador
  */
-export const getUserStreaks = async (userId: string): Promise<typeof Streak[]> => {
-  return Streak.find({ user: userId }).sort({ consecutiveDays: -1 });
+export const getUserStreaks = async (userId: string): Promise<Array<IStreak & { _id: string }>> => {
+  const results = await Streak.find({ user: userId }).sort({ consecutiveDays: -1 }).lean();
+  return results as unknown as Array<IStreak & { _id: string }>;
 };
 
 /**

@@ -68,7 +68,7 @@ export default function OnboardingModal() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                    Bem-vindo ao Gamify! 🎮
+                    Bem-vindo ao Taskify! 🎮
                   </h2>
                   <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                     Complete as missões para ganhar pontos extras!

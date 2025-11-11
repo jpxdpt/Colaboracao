@@ -7,6 +7,7 @@ import {
 } from '../services/currencyService';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
+import { paginationSchema } from '@taskify/shared';
 
 const convertPointsSchema = z.object({
   points: z.number().int().min(1),
@@ -48,7 +49,7 @@ export const getCurrencyHistory = async (
       return;
     }
 
-    const limit = parseInt(req.query.limit as string) || 50;
+    const { limit } = paginationSchema.parse(req.query);
     const history = await getTransactionHistory(userId, limit);
 
     if (!history) {

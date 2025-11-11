@@ -1,6 +1,6 @@
-# Gamify - Aplicação Gamificada para Colaboradores
+# Taskify - Aplicação de Gestão de Tarefas Gamificada
 
-Aplicação completa de gamificação para colaboradores corporativos, inspirada nas melhores práticas de ferramentas como Duolingo, Habitica, Trello e Kahoot!.
+Aplicação completa de gestão de tarefas gamificada para colaboradores corporativos, inspirada nas melhores práticas de ferramentas como Duolingo, Habitica, Trello e Kahoot!.
 
 ## 🎯 Características Principais
 

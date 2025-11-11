@@ -1,23 +1,26 @@
 import { Response } from 'express';
 import { Ranking, Points } from '../models';
-import { RankingType } from '@gamify/shared';
+import { RankingType } from '@taskify/shared';
 import { AuthRequest } from '../middleware/auth';
 import mongoose from 'mongoose';
+import { logger } from '../utils/logger';
 
 /**
  * GET /api/gamification/rankings - Lista rankings por tipo
  */
 export const getRankings = async (req: AuthRequest, res: Response): Promise<void> => {
+  const typeParam = (req.query.type as string) ?? 'weekly';
+  const limitParam = (req.query.limit as string) ?? '100';
+  const limitNum = parseInt(limitParam, 10) || 100;
+
   try {
-    const { type = 'weekly', limit = '100' } = req.query;
-    const limitNum = parseInt(limit as string, 10) || 100;
 
     // Calcular período baseado no tipo
     const now = new Date();
     let periodStart: Date;
     let periodEnd: Date = now;
 
-    switch (type) {
+    switch (typeParam) {
       case 'weekly':
         periodStart = new Date(now);
         periodStart.setDate(now.getDate() - 7);
@@ -35,7 +38,7 @@ export const getRankings = async (req: AuthRequest, res: Response): Promise<void
 
     // Buscar rankings do período
     const rankings = await Ranking.find({
-      type: type as RankingType,
+      type: typeParam as RankingType,
       periodStart: { $lte: periodEnd },
       periodEnd: { $gte: periodStart },
     })
@@ -44,9 +47,12 @@ export const getRankings = async (req: AuthRequest, res: Response): Promise<void
       .limit(limitNum)
       .lean();
 
-    res.json({ rankings, type, periodStart, periodEnd });
+    res.json({ rankings, type: typeParam, periodStart, periodEnd });
   } catch (error) {
-    console.error('Erro ao buscar rankings:', error);
+    logger.error('Erro ao buscar rankings', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      type: typeParam,
+    });
     res.status(500).json({ error: 'Erro ao buscar rankings' });
   }
 };
@@ -62,13 +68,13 @@ export const getUserRanking = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    const { type = 'weekly' } = req.query;
+    const typeParam = (req.query.type as string) ?? 'weekly';
 
     // Calcular período
     const now = new Date();
     let periodStart: Date;
 
-    switch (type) {
+    switch (typeParam) {
       case 'weekly':
         periodStart = new Date(now);
         periodStart.setDate(now.getDate() - 7);
@@ -86,7 +92,7 @@ export const getUserRanking = async (req: AuthRequest, res: Response): Promise<v
 
     // Buscar ranking do utilizador
     const ranking = await Ranking.findOne({
-      type: type as RankingType,
+      type: typeParam as RankingType,
       user: userId,
       periodStart: { $lte: now },
       periodEnd: { $gte: periodStart },
@@ -137,7 +143,7 @@ export const getUserRanking = async (req: AuthRequest, res: Response): Promise<v
       res.json({
         position,
         points: totalPoints,
-        type,
+        type: typeParam,
         periodStart,
         periodEnd: now,
       });
@@ -146,7 +152,11 @@ export const getUserRanking = async (req: AuthRequest, res: Response): Promise<v
 
     res.json(ranking);
   } catch (error) {
-    console.error('Erro ao buscar ranking do utilizador:', error);
+    logger.error('Erro ao buscar ranking do utilizador', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId: req.user?._id,
+      type: req.query.type
+    });
     res.status(500).json({ error: 'Erro ao buscar ranking do utilizador' });
   }
 };
@@ -155,14 +165,16 @@ export const getUserRanking = async (req: AuthRequest, res: Response): Promise<v
  * GET /api/gamification/rankings/top - Top N utilizadores
  */
 export const getTopRankings = async (req: AuthRequest, res: Response): Promise<void> => {
+  const typeParam = (req.query.type as string) ?? 'weekly';
+  const limitParam = (req.query.limit as string) ?? '10';
+  const limitNum = parseInt(limitParam, 10) || 10;
+
   try {
-    const { type = 'weekly', limit = '10' } = req.query;
-    const limitNum = parseInt(limit as string, 10) || 10;
 
     const now = new Date();
     let periodStart: Date;
 
-    switch (type) {
+    switch (typeParam) {
       case 'weekly':
         periodStart = new Date(now);
         periodStart.setDate(now.getDate() - 7);
@@ -180,7 +192,7 @@ export const getTopRankings = async (req: AuthRequest, res: Response): Promise<v
 
     // Buscar top rankings
     const rankings = await Ranking.find({
-      type: type as RankingType,
+      type: typeParam as RankingType,
       periodStart: { $lte: now },
       periodEnd: { $gte: periodStart },
     })
@@ -189,9 +201,13 @@ export const getTopRankings = async (req: AuthRequest, res: Response): Promise<v
       .limit(limitNum)
       .lean();
 
-    res.json({ rankings, type, periodStart, periodEnd: now });
+    res.json({ rankings, type: typeParam, periodStart, periodEnd: now });
   } catch (error) {
-    console.error('Erro ao buscar top rankings:', error);
+    logger.error('Erro ao buscar top rankings', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      type: typeParam,
+      limit: limitNum,
+    });
     res.status(500).json({ error: 'Erro ao buscar top rankings' });
   }
 };

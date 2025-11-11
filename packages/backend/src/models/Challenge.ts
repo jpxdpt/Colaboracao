@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IChallenge extends Document {
+export interface IChallenge extends IBaseDocument {
   title: string;
   description: string;
   type: 'weekly' | 'monthly' | 'special';
@@ -26,7 +27,7 @@ export interface IChallenge extends Document {
   updatedAt: Date;
 }
 
-export interface IChallengeProgress extends Document {
+export interface IChallengeProgress extends IBaseDocument {
   challenge: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   progress: Array<{
@@ -153,7 +154,7 @@ const ChallengeProgressSchema = new Schema<IChallengeProgress>(
 ChallengeProgressSchema.index({ challenge: 1, user: 1 }, { unique: true });
 ChallengeProgressSchema.index({ user: 1, completed: 1 });
 
-export interface IChallengeTeamProgress extends Document {
+export interface IChallengeTeamProgress extends IBaseDocument {
   challenge: mongoose.Types.ObjectId;
   team: mongoose.Types.ObjectId;
   progress: Array<{
@@ -223,4 +224,5 @@ export const ChallengeTeamProgress = mongoose.model<IChallengeTeamProgress>(
   'ChallengeTeamProgress',
   ChallengeTeamProgressSchema
 );
+
 

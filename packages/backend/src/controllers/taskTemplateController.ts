@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { Task, User } from '../models';
 import { AuthRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
-import { UserRole } from '@gamify/shared';
+import { UserRole } from '@taskify/shared';
 
 interface TaskTemplate {
   name: string;

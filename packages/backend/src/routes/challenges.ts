@@ -11,7 +11,7 @@ import {
   distributeRewardsHandler,
 } from '../controllers/challengeController';
 import { authenticate, authorize } from '../middleware/auth';
-import { UserRole } from '@gamify/shared';
+import { UserRole } from '@taskify/shared';
 
 const router = Router();
 

@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IQuest extends Document {
+export interface IQuest extends IBaseDocument {
   title: string;
   description: string;
   narrative: string; // storytelling contextualizado
@@ -23,7 +24,7 @@ export interface IQuest extends Document {
   updatedAt: Date;
 }
 
-export interface IQuestProgress extends Document {
+export interface IQuestProgress extends IBaseDocument {
   quest: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   objectivesProgress: Array<{
@@ -142,4 +143,5 @@ QuestProgressSchema.index({ user: 1, status: 1 });
 
 export const Quest = mongoose.model<IQuest>('Quest', QuestSchema);
 export const QuestProgress = mongoose.model<IQuestProgress>('QuestProgress', QuestProgressSchema);
+
 

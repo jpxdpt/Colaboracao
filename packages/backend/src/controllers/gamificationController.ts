@@ -8,6 +8,7 @@ import {
 } from '../services/gamificationService';
 import { Badge, Level, GamificationConfig } from '../models';
 import { AuthRequest } from '../middleware/auth';
+import { paginationSchema } from '@taskify/shared';
 
 /**
  * GET /api/gamification/points - Pontos totais do utilizador
@@ -41,7 +42,7 @@ export const getPointsHistoryHandler = async (
       return;
     }
 
-    const limit = parseInt(req.query.limit as string) || 50;
+    const { limit } = paginationSchema.parse(req.query);
     const history = await getPointsHistory(userId, limit);
     res.json(history);
   } catch (error) {

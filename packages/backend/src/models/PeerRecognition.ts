@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IPeerRecognition extends Document {
+export interface IPeerRecognition extends IBaseDocument {
   from: mongoose.Types.ObjectId; // quem dá o reconhecimento
   to: mongoose.Types.ObjectId; // quem recebe
   type: 'kudos' | 'thanks' | 'appreciation';
@@ -58,4 +59,5 @@ export const PeerRecognition = mongoose.model<IPeerRecognition>(
   'PeerRecognition',
   PeerRecognitionSchema
 );
+
 

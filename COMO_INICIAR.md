@@ -1,4 +1,4 @@
-# Como Iniciar o Projeto Gamify
+# Como Iniciar o Projeto Taskify
 
 ## Pré-requisitos
 
@@ -44,7 +44,7 @@ FRONTEND_URL=http://localhost:5173
 
 ```bash
 # Compilar shared primeiro
-npm run build --workspace=@gamify/shared
+npm run build --workspace=@taskify/shared
 
 # Ou compilar tudo
 npm run build

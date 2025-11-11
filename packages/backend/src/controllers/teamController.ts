@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { Team, TeamMember, TeamMessage } from '../models';
 import { z } from 'zod';
 import { AuthRequest } from '../middleware/auth';
-import { UserRole } from '@gamify/shared';
+import { UserRole } from '@taskify/shared';
 
 const createTeamSchema = z.object({
   name: z.string().min(1).max(100),

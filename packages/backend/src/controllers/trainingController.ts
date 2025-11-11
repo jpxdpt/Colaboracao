@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { awardPoints } from '../services/gamificationService';
 import { updateStreak } from '../services/streakService';
 import { AuthRequest } from '../middleware/auth';
+import { escapeRegex } from '../utils/logger';
+import { mongoIdSchema } from '@taskify/shared';
 
 const createTrainingSchema = z.object({
   title: z.string().min(1).max(200),
@@ -31,9 +33,10 @@ export const getTrainings = async (req: AuthRequest, res: Response): Promise<voi
     if (active !== undefined) query.active = active === 'true';
 
     if (search) {
+      const safeSearch = escapeRegex(search as string);
       query.$or = [
-        { title: { $regex: search as string, $options: 'i' } },
-        { description: { $regex: search as string, $options: 'i' } },
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 
@@ -54,7 +57,8 @@ export const getTrainings = async (req: AuthRequest, res: Response): Promise<voi
  */
 export const getTrainingById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const training = await Training.findById(req.params.id)
+    const { id } = z.object({ id: mongoIdSchema }).parse(req.params);
+    const training = await Training.findById(id)
       .populate('relatedBadges')
       .populate('prerequisites')
       .lean();
@@ -100,8 +104,9 @@ export const getTrainingProgress = async (
  */
 export const startTraining = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const { id } = z.object({ id: mongoIdSchema }).parse(req.params);
     const userId = req.user?._id?.toString();
-    const trainingId = req.params.id;
+    const trainingId = id;
 
     if (!userId) {
       res.status(401).json({ error: 'Não autenticado' });
@@ -147,8 +152,9 @@ export const updateTrainingProgress = async (
   res: Response
 ): Promise<void> => {
   try {
+    const { id } = z.object({ id: mongoIdSchema }).parse(req.params);
     const userId = req.user?._id?.toString();
-    const trainingId = req.params.id;
+    const trainingId = id;
     const { progress, completedModules } = req.body;
 
     if (!userId) {

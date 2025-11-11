@@ -12,7 +12,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
-import { TaskStatus } from '@gamify/shared';
+import { TaskStatus } from '@shared';
 import Confetti from '../components/feedback/Confetti';
 import KanbanView from '../components/tasks/KanbanView';
 import GanttView from '../components/tasks/GanttView';

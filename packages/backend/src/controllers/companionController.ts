@@ -13,11 +13,10 @@ export const getCompanion = async (req: AuthRequest, res: Response): Promise<voi
       return;
     }
 
-    let companion = await Companion.findOne({ user: userId }).lean();
+    let companion = await Companion.findOne({ user: userId });
 
-    // Se não existe, criar um companheiro padrão
     if (!companion) {
-      const newCompanion = new Companion({
+      companion = new Companion({
         user: userId,
         type: 'pet',
         name: 'Aventureiro',
@@ -26,11 +25,10 @@ export const getCompanion = async (req: AuthRequest, res: Response): Promise<voi
         currentEvolution: 0,
         nextEvolutionLevel: 5,
       });
-      await newCompanion.save();
-      companion = newCompanion.toObject();
+      await companion.save();
     }
 
-    res.json(companion);
+    res.json(companion.toObject());
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar companheiro' });
   }
@@ -67,7 +65,7 @@ export const updateCompanion = async (req: AuthRequest, res: Response): Promise<
 
     await companion.save();
 
-    res.json(companion);
+    res.json(companion.toObject());
   } catch (error) {
     res.status(500).json({ error: 'Erro ao atualizar companheiro' });
   }
@@ -116,7 +114,7 @@ export const feedCompanion = async (req: AuthRequest, res: Response): Promise<vo
     await companion.save();
 
     res.json({
-      companion,
+      companion: companion.toObject(),
       leveledUp,
       evolved,
       newLevel: companion.level,

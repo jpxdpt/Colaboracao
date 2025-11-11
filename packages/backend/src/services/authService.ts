@@ -1,8 +1,9 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import { config } from '../config';
 import { User, IUser } from '../models/User';
 import { AppError } from '../middleware/errorHandler';
 import { getRedisClient, isRedisAvailable } from '../config/redis';
+import { logger } from '../utils/logger';
 
 export interface TokenPayload {
   userId: string;
@@ -25,12 +26,14 @@ export const generateTokens = (user: IUser): AuthTokens => {
     role: user.role,
   };
 
-  const accessToken = jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.accessExpiresIn as string,
+  const jwtSecret: Secret | string = config.jwt.secret as string;
+
+  const accessToken = jwt.sign(payload, jwtSecret, {
+    expiresIn: config.jwt.accessExpiresIn as jwt.SignOptions['expiresIn'],
   });
 
-  const refreshToken = jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.refreshExpiresIn as string,
+  const refreshToken = jwt.sign(payload, jwtSecret, {
+    expiresIn: config.jwt.refreshExpiresIn as jwt.SignOptions['expiresIn'],
   });
 
   return { accessToken, refreshToken };
@@ -54,7 +57,10 @@ export const blacklistToken = async (token: string, expiresIn: string): Promise<
     }
   } catch (error) {
     // Não falhar se não conseguir adicionar à blacklist
-    console.error('Erro ao adicionar token à blacklist:', error);
+    logger.warn('Falha ao adicionar token à blacklist (continuando)', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      tokenPrefix: token.substring(0, 10) + '...'
+    });
   }
 };
 
@@ -78,8 +84,11 @@ export const isTokenBlacklisted = async (token: string): Promise<boolean> => {
     // assumir que o token não está blacklisted para não bloquear autenticação
     // Log apenas em desenvolvimento
     if (process.env.NODE_ENV === 'development') {
-      console.warn('Erro ao verificar blacklist (continuando sem Redis):', error);
-  }
+      logger.warn('Erro ao verificar blacklist (continuando sem Redis)', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        tokenPrefix: token.substring(0, 10) + '...'
+      });
+    }
   }
 
   // Por padrão, retornar false (token não está blacklisted)

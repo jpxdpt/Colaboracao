@@ -9,8 +9,8 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { queryClient } from '../main';
 
-const REMEMBER_ME_KEY = 'gamify-remember-me';
-const REMEMBERED_EMAIL_KEY = 'gamify-remembered-email';
+const REMEMBER_ME_KEY = 'taskify-remember-me';
+const REMEMBERED_EMAIL_KEY = 'taskify-remembered-email';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -136,7 +136,7 @@ export default function Login() {
                 <Sparkles className="w-10 h-10 text-white" />
               </div>
             </motion.div>
-            <h1 className="text-4xl font-bold text-gradient-purple">Gamify</h1>
+            <h1 className="text-4xl font-bold text-gradient-purple">Taskify</h1>
             <p className="text-gray-600 dark:text-gray-300">Transforme seu trabalho em uma aventura!</p>
           </div>
 

@@ -1,4 +1,5 @@
-import { Currency } from '../models';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Currency, ICurrency } from '../models';
 
 /**
  * Serviço de Moeda Virtual - Economia interna do sistema
@@ -16,10 +17,12 @@ interface TransactionParams {
 /**
  * Adiciona ou remove moeda do utilizador
  */
-export const addTransaction = async (params: TransactionParams): Promise<{
-  currency: typeof Currency;
+interface TransactionResult {
+  currency: HydratedDocument<ICurrency>;
   newBalance: number;
-}> => {
+}
+
+export const addTransaction = async (params: TransactionParams): Promise<TransactionResult> => {
   const { userId, type, amount, source, description, metadata } = params;
 
   // Buscar ou criar currency do utilizador
@@ -66,18 +69,22 @@ export const addTransaction = async (params: TransactionParams): Promise<{
  * Busca saldo atual do utilizador
  */
 export const getBalance = async (userId: string): Promise<number> => {
-  const currency = await Currency.findOne({ user: userId });
+  const currency = await Currency.findOne({ user: userId }).lean();
   return currency?.balance || 0;
 };
 
 /**
  * Busca histórico de transações
  */
+type CurrencyHistory = Pick<ICurrency, 'balance' | 'transactions' | 'user' | 'createdAt' | 'updatedAt'> & {
+  _id: mongoose.Types.ObjectId;
+};
+
 export const getTransactionHistory = async (
   userId: string,
   limit = 50
-): Promise<typeof Currency | null> => {
-  const currency = await Currency.findOne({ user: userId });
+): Promise<CurrencyHistory | null> => {
+  const currency = await Currency.findOne({ user: userId }).lean();
   if (!currency) {
     return null;
   }
@@ -88,9 +95,9 @@ export const getTransactionHistory = async (
     .slice(0, limit);
 
   return {
-    ...currency.toObject(),
+    ...currency,
     transactions: recentTransactions,
-  } as typeof Currency;
+  } as CurrencyHistory;
 };
 
 /**
@@ -101,7 +108,7 @@ export const convertPointsToCurrency = async (
   points: number,
   rate: number = 10 // 10 pontos = 1 moeda por padrão
 ): Promise<{
-  currency: typeof Currency;
+  currency: HydratedDocument<ICurrency>;
   currencyEarned: number;
 }> => {
   const currencyEarned = Math.floor(points / rate);

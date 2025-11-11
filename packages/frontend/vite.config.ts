@@ -10,9 +10,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt'],
       manifest: {
-        name: 'Gamify - Aplicação Gamificada',
-        short_name: 'Gamify',
-        description: 'Aplicação gamificada para colaboradores',
+        name: 'Taskify - Aplicação de Gestão de Tarefas',
+        short_name: 'Taskify',
+        description: 'Aplicação de gestão de tarefas gamificada',
         theme_color: '#6366f1',
         icons: [
           {
@@ -56,5 +56,6 @@ export default defineConfig({
     host: true,
   },
 });
+
 
 

@@ -152,7 +152,7 @@ export default function Register() {
                 <Sparkles className="w-10 h-10 text-white" />
               </div>
             </motion.div>
-            <h1 className="text-4xl font-bold text-gradient-purple">Gamify</h1>
+            <h1 className="text-4xl font-bold text-gradient-purple">Taskify</h1>
             <p className="text-gray-600 dark:text-gray-300">Crie sua conta e comece a gamificar!</p>
           </div>
 

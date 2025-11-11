@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IReward extends Document {
+export interface IReward extends IBaseDocument {
   name: string;
   description: string;
   type: 'virtual' | 'real';
@@ -13,7 +14,7 @@ export interface IReward extends Document {
   updatedAt: Date;
 }
 
-export interface IRewardRedemption extends Document {
+export interface IRewardRedemption extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   reward: mongoose.Types.ObjectId;
   quantity: number;
@@ -118,4 +119,5 @@ export const RewardRedemption = mongoose.model<IRewardRedemption>(
   'RewardRedemption',
   RewardRedemptionSchema
 );
+
 

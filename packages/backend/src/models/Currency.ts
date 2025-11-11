@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface ICurrency extends Document {
+export interface ICurrency extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   balance: number;
   transactions: Array<{
@@ -68,4 +69,5 @@ CurrencySchema.index({ user: 1 });
 CurrencySchema.index({ 'transactions.timestamp': -1 });
 
 export const Currency = mongoose.model<ICurrency>('Currency', CurrencySchema);
+
 

@@ -1,8 +1,8 @@
 {
-  "name": "gamify",
+  "name": "taskify",
   "version": "1.0.0",
   "private": true,
-  "description": "Aplicação Gamificada para Colaboradores - Monorepo",
+  "description": "Aplicação de Gestão de Tarefas Gamificada - Monorepo",
   "workspaces": [
     "packages/*"
   ],

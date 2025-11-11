@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IActivity extends Document {
+export interface IActivity extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   type: 'task_completed' | 'badge_earned' | 'streak_milestone' | 'goal_achieved' | 'level_up' | 'points_awarded' | 'team_joined' | 'challenge_completed';
   title: string;
@@ -68,4 +69,5 @@ ActivitySchema.index({ type: 1, createdAt: -1 });
 ActivitySchema.index({ createdAt: -1 });
 
 export const Activity = mongoose.model<IActivity>('Activity', ActivitySchema);
+
 

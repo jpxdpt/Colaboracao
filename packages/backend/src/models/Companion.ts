@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface ICompanion extends Document {
+export interface ICompanion extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   type: string; // tipo do companheiro (pet, companion, etc)
   name: string;
@@ -67,4 +68,5 @@ CompanionSchema.index({ user: 1 });
 CompanionSchema.index({ level: 1 });
 
 export const Companion = mongoose.model<ICompanion>('Companion', CompanionSchema);
+
 

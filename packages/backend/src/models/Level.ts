@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface ILevel extends Document {
+export interface ILevel extends IBaseDocument {
   level: number;
   pointsRequired: number;
   name: string;
@@ -44,4 +45,5 @@ const LevelSchema = new Schema<ILevel>(
 );
 
 export const Level = mongoose.model<ILevel>('Level', LevelSchema);
+
 

@@ -252,7 +252,7 @@ export const getLevelProgress = async (userId: string): Promise<{
 export const getPointsHistory = async (
   userId: string,
   limit = 50
-): Promise<typeof Points[]> => {
+): Promise<any[]> => {
   return Points.find({ user: userId })
     .sort({ timestamp: -1 })
     .limit(limit)
@@ -262,7 +262,7 @@ export const getPointsHistory = async (
 /**
  * Busca badges do utilizador
  */
-export const getUserBadges = async (userId: string): Promise<typeof UserBadge[]> => {
+export const getUserBadges = async (userId: string): Promise<any[]> => {
   return UserBadge.find({ user: userId })
     .populate('badge')
     .sort({ earnedAt: -1 })

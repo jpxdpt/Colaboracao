@@ -5,7 +5,7 @@ import { awardPoints } from '../services/gamificationService';
 import { joinTeamToChallenge, updateTeamChallengeRanking, distributeChallengeRewards } from '../services/challengeService';
 import { AuthRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
-import { UserRole } from '@gamify/shared';
+import { UserRole, mongoIdSchema } from '@taskify/shared';
 
 /**
  * GET /api/gamification/challenges - Lista desafios
@@ -27,7 +27,7 @@ export const getChallenges = async (req: AuthRequest, res: Response): Promise<vo
 
     res.json(challenges);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar desafios' });
+    throw new AppError('Erro ao buscar desafios', 500);
   }
 };
 
@@ -39,20 +39,23 @@ export const getChallengeById = async (
   res: Response
 ): Promise<void> => {
   try {
-    const challenge = await Challenge.findById(req.params.id)
+    const { id } = z.object({ id: mongoIdSchema }).parse(req.params);
+    const challenge = await Challenge.findById(id)
       .populate('rewards.badges')
       .populate('participants', 'name email avatar')
       .populate('participatingTeams', 'name avatar description')
       .lean();
 
     if (!challenge) {
-      res.status(404).json({ error: 'Desafio não encontrado' });
-      return;
+      throw new AppError('Desafio não encontrado', 404);
     }
 
     res.json(challenge);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar desafio' });
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError('Erro ao buscar desafio', 500);
   }
 };
 
@@ -62,23 +65,20 @@ export const getChallengeById = async (
 export const joinChallenge = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?._id?.toString();
-    const challengeId = req.params.id;
+    const { id: challengeId } = z.object({ id: mongoIdSchema }).parse(req.params);
 
     if (!userId) {
-      res.status(401).json({ error: 'Não autenticado' });
-      return;
+      throw new AppError('Não autenticado', 401);
     }
 
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) {
-      res.status(404).json({ error: 'Desafio não encontrado' });
-      return;
+      throw new AppError('Desafio não encontrado', 404);
     }
 
     // Verificar se já participa
     if (challenge.participants.includes(userId as unknown as typeof challenge.participants[0])) {
-      res.status(400).json({ error: 'Já está participando neste desafio' });
-      return;
+      throw new AppError('Já está participando neste desafio', 400);
     }
 
     // Adicionar participante
@@ -114,7 +114,7 @@ export const getChallengeProgress = async (
 ): Promise<void> => {
   try {
     const userId = req.user?._id?.toString();
-    const challengeId = req.params.id;
+    const { id: challengeId } = z.object({ id: mongoIdSchema }).parse(req.params);
 
     if (!userId) {
       res.status(401).json({ error: 'Não autenticado' });
@@ -148,8 +148,8 @@ export const joinTeamToChallengeHandler = async (
 ): Promise<void> => {
   try {
     const userId = req.user?._id?.toString();
-    const challengeId = req.params.id;
-    const { teamId } = req.body;
+    const { id: challengeId } = z.object({ id: mongoIdSchema }).parse(req.params);
+    const { teamId } = z.object({ teamId: mongoIdSchema }).parse(req.body);
 
     if (!userId) {
       throw new AppError('Não autenticado', 401);
@@ -190,7 +190,7 @@ export const getTeamChallengeRanking = async (
   res: Response
 ): Promise<void> => {
   try {
-    const challengeId = req.params.id;
+    const { id: challengeId } = z.object({ id: mongoIdSchema }).parse(req.params);
 
     const challenge = await Challenge.findById(challengeId);
     if (!challenge) {
@@ -228,8 +228,10 @@ export const getTeamChallengeProgress = async (
   res: Response
 ): Promise<void> => {
   try {
-    const challengeId = req.params.id;
-    const teamId = req.params.teamId;
+    const { id: challengeId, teamId } = z.object({
+      id: mongoIdSchema,
+      teamId: mongoIdSchema
+    }).parse(req.params);
 
     const teamProgress = await ChallengeTeamProgress.findOne({
       challenge: challengeId,
@@ -314,7 +316,7 @@ export const distributeRewardsHandler = async (
       throw new AppError('Apenas administradores podem distribuir recompensas', 403);
     }
 
-    const challengeId = req.params.id;
+    const { id: challengeId } = z.object({ id: mongoIdSchema }).parse(req.params);
     await distributeChallengeRewards(challengeId);
 
     res.json({

@@ -1,8 +1,9 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
-import { UserRole } from '@gamify/shared';
+import { UserRole } from '@taskify/shared';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IUser extends Document {
+export interface IUser extends IBaseDocument {
   email: string;
   password: string;
   name: string;
@@ -110,6 +111,11 @@ const UserSchema = new Schema<IUser>(
     timestamps: true,
   }
 );
+
+// Índices compostos para queries frequentes
+UserSchema.index({ role: 1, department: 1 }); // Para filtros de admin
+UserSchema.index({ department: 1, createdAt: -1 }); // Para relatórios por departamento
+UserSchema.index({ isDeleted: 1, createdAt: -1 }); // Para limpeza de dados
 
 // Hash password antes de salvar
 UserSchema.pre('save', async function (next) {

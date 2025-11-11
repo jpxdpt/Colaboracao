@@ -65,23 +65,29 @@ export const exportDataToCsv = async (req: AuthRequest, res: Response): Promise<
         filename = 'points.csv';
         break;
 
-      case 'goals':
-        const goals = await Goal.find({ owner: userId }).lean();
+      case 'goals': {
+        const goals = await Goal.find({ createdBy: userId }).lean();
 
         csvContent = [
           'Título,Descrição,Status,Progresso,Data de Criação',
-          ...goals.map((goal) =>
-            [
+          ...goals.map((goal) => {
+            const progress =
+              goal.target > 0
+                ? Math.min(100, Math.round((goal.currentProgress / goal.target) * 100))
+                : 0;
+
+            return [
               `"${goal.title}"`,
               `"${goal.description || ''}"`,
               goal.status,
-              `${goal.progress}%`,
+              `${progress}%`,
               new Date(goal.createdAt).toISOString(),
-            ].join(',')
-          ),
+            ].join(',');
+          }),
         ].join('\n');
         filename = 'goals.csv';
         break;
+      }
 
       default:
         throw new AppError('Tipo inválido. Use: tasks, points, goals', 400);

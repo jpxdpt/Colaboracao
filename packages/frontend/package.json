@@ -1,5 +1,5 @@
 {
-  "name": "@gamify/frontend",
+  "name": "@taskify/frontend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
-    "@gamify/shared": "*",
+    "@taskify/shared": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.1",

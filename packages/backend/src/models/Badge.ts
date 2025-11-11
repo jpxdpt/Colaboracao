@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { BadgeRarity } from '@gamify/shared';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
+import { BadgeRarity } from '@taskify/shared';
 
-export interface IBadge extends Document {
+export interface IBadge extends IBaseDocument {
   name: string;
   description: string;
   icon: string;
@@ -13,7 +14,7 @@ export interface IBadge extends Document {
   updatedAt: Date;
 }
 
-export interface IBadgeCriteria extends Document {
+export interface IBadgeCriteria extends IBaseDocument {
   badge: mongoose.Types.ObjectId;
   type: 'count' | 'threshold' | 'combo';
   value: number;
@@ -23,7 +24,7 @@ export interface IBadgeCriteria extends Document {
   updatedAt: Date;
 }
 
-export interface IUserBadge extends Document {
+export interface IUserBadge extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   badge: mongoose.Types.ObjectId;
   earnedAt: Date;
@@ -134,4 +135,5 @@ UserBadgeSchema.index({ user: 1, badge: 1 }, { unique: true });
 export const Badge = mongoose.model<IBadge>('Badge', BadgeSchema);
 export const BadgeCriteria = mongoose.model<IBadgeCriteria>('BadgeCriteria', BadgeCriteriaSchema);
 export const UserBadge = mongoose.model<IUserBadge>('UserBadge', UserBadgeSchema);
+
 

@@ -1,12 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
+import { HydratedDocument } from 'mongoose';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
 import { User, IUser } from '../models/User';
 import { AppError } from './errorHandler';
 import { isTokenBlacklisted } from '../services/authService';
+import { logger } from '../utils/logger';
 
 export interface AuthRequest extends Request {
-  user?: IUser;
+  user?: HydratedDocument<IUser>;
 }
 
 /**
@@ -20,24 +22,32 @@ export const authenticate = async (
   try {
     const authHeader = req.headers.authorization;
 
-    // Log para debug
-    console.log('🔍 Auth Middleware:', {
-      hasAuthHeader: !!authHeader,
-      authHeaderStart: authHeader?.substring(0, 20),
-      path: req.path,
-      method: req.method
-    });
+    // Log para debug (apenas em desenvolvimento)
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('Auth middleware request', {
+        hasAuthHeader: !!authHeader,
+        path: req.path,
+        method: req.method,
+        ip: req.ip
+      });
+    }
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.warn('❌ Token não fornecido ou formato inválido');
+      logger.warn('Token não fornecido ou formato inválido', {
+        path: req.path,
+        method: req.method,
+        ip: req.ip
+      });
       throw new AppError('Token de autenticação não fornecido', 401);
     }
 
     const token = authHeader.substring(7);
-    console.log('🔑 Token extraído:', {
-      tokenLength: token.length,
-      tokenStart: token.substring(0, 20) + '...'
-    });
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('Token extraído', {
+        tokenLength: token.length,
+        path: req.path
+      });
+    }
 
     // Verificar se token está na blacklist (ignorar erros se Redis não estiver disponível)
     try {
@@ -58,12 +68,16 @@ export const authenticate = async (
     let decoded: { userId: string };
     try {
       decoded = jwt.verify(token, config.jwt.secret) as { userId: string };
-      console.log('✅ Token válido, userId:', decoded.userId);
+      if (process.env.NODE_ENV === 'development') {
+        logger.debug('Token JWT válido', { userId: decoded.userId });
+      }
     } catch (jwtError) {
-      console.error('❌ Erro ao verificar token:', {
+      logger.error('Erro ao verificar token JWT', {
         error: jwtError instanceof Error ? jwtError.message : 'Unknown error',
-        errorType: jwtError instanceof jwt.JsonWebTokenError ? 'JsonWebTokenError' : 
-                   jwtError instanceof jwt.TokenExpiredError ? 'TokenExpiredError' : 'Other'
+        errorType: jwtError instanceof jwt.JsonWebTokenError ? 'JsonWebTokenError' :
+                   jwtError instanceof jwt.TokenExpiredError ? 'TokenExpiredError' : 'Other',
+        path: req.path,
+        ip: req.ip
       });
       throw jwtError;
     }
@@ -72,16 +86,27 @@ export const authenticate = async (
     const user = await User.findById(decoded.userId);
 
     if (!user) {
-      console.error('❌ Utilizador não encontrado:', decoded.userId);
+      logger.error('Utilizador não encontrado para token válido', {
+        userId: decoded.userId,
+        path: req.path,
+        ip: req.ip
+      });
       throw new AppError('Utilizador não encontrado', 401);
     }
-    
+
     if (user.isDeleted) {
-      console.warn('⚠️ Utilizador marcado como eliminado tentou autenticar:', user.email);
+      logger.warn('Tentativa de autenticação com conta eliminada', {
+        userId: user._id,
+        email: user.email,
+        path: req.path,
+        ip: req.ip
+      });
       throw new AppError('Conta desativada. Contacte o suporte.', 403);
     }
-    
-    console.log('✅ Utilizador encontrado:', user.email);
+
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('Utilizador encontrado', { userId: user._id, email: user.email });
+    }
 
     // Adicionar utilizador ao request
     req.user = user;

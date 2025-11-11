@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IReport extends Document {
+export interface IReport extends IBaseDocument {
   title: string;
   description: string;
   category: string;
@@ -84,4 +85,5 @@ ReportSchema.index({ severity: 1, status: 1 });
 ReportSchema.index({ reportedBy: 1, status: 1 });
 
 export const Report = mongoose.model<IReport>('Report', ReportSchema);
+
 

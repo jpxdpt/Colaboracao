@@ -9,16 +9,38 @@ import {
   isTokenBlacklisted,
   verifyRefreshToken,
 } from '../services/authService';
-import { registerSchema, loginSchema, changePasswordSchema } from '@gamify/shared';
+import { registerSchema, loginSchema, changePasswordSchema } from '@taskify/shared';
 import { AuditLog } from '../models/AuditLog';
-import { UserRole } from '@gamify/shared';
+import { UserRole } from '@taskify/shared';
 import { getTotalPoints, getLevelProgress, getUserBadges } from '../services/gamificationService';
-import { Task, Goal, Points, UserBadge, TeamMember, Team } from '../models';
+import { Task, Goal, Points, UserBadge, TeamMember, Team, Level } from '../models';
+import mongoose from 'mongoose';
 
 interface UserStats {
   totalPoints: number;
   currentLevel: number;
   badgesCount: number;
+}
+
+interface UserWithStats {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  avatar?: string | null;
+  department: string;
+  role: UserRole;
+  createdAt: Date;
+  stats: UserStats;
+}
+
+interface UsersWithStatsResult {
+  users: UserWithStats[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }
 
 const buildUserFilters = (
@@ -27,8 +49,10 @@ const buildUserFilters = (
   filters: Record<string, unknown>;
   sortField: string;
   sortOrder: 1 | -1;
+  page: number;
+  limit: number;
 } => {
-  const { search, role, department, sortBy = 'name', order = 'asc', includeDeleted } = query;
+  const { search, role, department, sortBy = 'name', order = 'asc', includeDeleted, page = 1, limit = 10 } = query;
 
   const filters: Record<string, unknown> = {};
 
@@ -57,56 +81,98 @@ const buildUserFilters = (
 
   const sortField = typeof sortBy === 'string' && sortBy ? sortBy : 'name';
   const sortOrder = order === 'desc' ? -1 : 1;
+  const pageNum = typeof page === 'number' ? page : parseInt(page as string) || 1;
+  const limitNum = typeof limit === 'number' ? Math.min(limit, 100) : Math.min(parseInt(limit as string) || 10, 100);
 
   return {
     filters,
     sortField,
     sortOrder,
+    page: pageNum,
+    limit: limitNum,
   };
 };
 
 const fetchUsersWithStats = async (
   filters: Record<string, unknown>,
   sortField: string,
-  sortOrder: 1 | -1
-) => {
+  sortOrder: 1 | -1,
+  page: number,
+  limit: number
+): Promise<UsersWithStatsResult> => {
   // Se ordenar por stats, buscar todos e ordenar depois
   const shouldSortByStats = sortField.startsWith('stats.');
-  
+
+  // Buscar usuários com paginação
+  const skip = (page - 1) * limit;
   const users = await User.find(filters, 'name email avatar department role createdAt')
     .sort(shouldSortByStats ? { name: 1 } : { [sortField]: sortOrder })
+    .skip(skip)
+    .limit(limit)
     .lean();
 
-  const usersWithStats = await Promise.all(
-    users.map(async (user) => {
-      const userId = user._id.toString();
-      try {
-        const [totalPoints, levelProgress, badges] = await Promise.all([
-          getTotalPoints(userId),
-          getLevelProgress(userId),
-          getUserBadges(userId),
-        ]);
+  // Buscar total para paginação
+  const total = await User.countDocuments(filters);
 
-        return {
-          ...user,
-          stats: {
-            totalPoints,
-            currentLevel: levelProgress.currentLevel,
-            badgesCount: badges.length,
-          },
-        };
-      } catch (error) {
-        return {
-          ...user,
-          stats: {
-            totalPoints: 0,
-            currentLevel: 1,
-            badgesCount: 0,
-          },
-        };
-      }
-    })
+  const pages = Math.max(1, Math.ceil(total / limit));
+
+  if (users.length === 0) {
+    return {
+      users: [],
+      pagination: { page, limit, total, pages },
+    };
+  }
+
+  const userIds = users.map((user) => user._id as mongoose.Types.ObjectId);
+
+  // Buscar pontos totais usando agregação (otimizado)
+  const pointsAggregation = await Points.aggregate([
+    { $match: { user: { $in: userIds } } },
+    { $group: { _id: '$user', total: { $sum: '$amount' } } },
+  ]);
+
+  const pointsMap = new Map(
+    pointsAggregation.map(item => [item._id.toString(), item.total || 0])
   );
+
+  // Buscar contagem de badges usando agregação (otimizado)
+  const badgesAggregation = await UserBadge.aggregate([
+    { $match: { user: { $in: userIds } } },
+    { $group: { _id: '$user', count: { $sum: 1 } } },
+  ]);
+
+  const badgesMap = new Map(
+    badgesAggregation.map(item => [item._id.toString(), item.count || 0])
+  );
+
+  // Buscar níveis uma vez (cache)
+  const levels = await Level.find().sort({ level: 1 }).lean();
+
+  // Combinar dados
+  const usersWithStats: UserWithStats[] = users.map((user) => {
+    const userId = (user._id as mongoose.Types.ObjectId).toString();
+    const totalPoints = pointsMap.get(userId) || 0;
+    const badgesCount = badgesMap.get(userId) || 0;
+
+    // Calcular nível baseado nos pontos (otimizado)
+    let currentLevel = 1;
+    for (const level of levels) {
+      if (totalPoints >= level.pointsRequired) {
+        currentLevel = level.level;
+      } else {
+        break;
+      }
+    }
+
+    return {
+      ...user,
+      stats: {
+        totalPoints,
+        currentLevel,
+        badgesCount,
+      },
+    };
+  });
 
   // Ordenar por stats se necessário
   if (shouldSortByStats) {
@@ -118,7 +184,15 @@ const fetchUsersWithStats = async (
     });
   }
 
-  return usersWithStats;
+  return {
+    users: usersWithStats,
+    pagination: {
+      page,
+      limit,
+      total,
+      pages,
+    },
+  };
 };
 
 /**
@@ -378,12 +452,13 @@ export const getUsers = async (req: AuthRequest, res: Response): Promise<void> =
     throw new AppError('Acesso negado. Apenas administradores podem listar usuários.', 403);
   }
 
-  const { filters, sortField, sortOrder } = buildUserFilters(req.query);
-  const usersWithStats = await fetchUsersWithStats(filters, sortField, sortOrder);
+  const { filters, sortField, sortOrder, page, limit } = buildUserFilters(req.query);
+  const result = await fetchUsersWithStats(filters, sortField, sortOrder, page, limit);
 
   res.json({
     success: true,
-    data: usersWithStats,
+    data: result.users,
+    pagination: result.pagination,
   });
 };
 
@@ -494,11 +569,11 @@ export const exportUsersCsv = async (req: AuthRequest, res: Response): Promise<v
     throw new AppError('Acesso negado. Apenas administradores podem exportar utilizadores.', 403);
   }
 
-  const { filters, sortField, sortOrder } = buildUserFilters(req.query);
-  const usersWithStats = await fetchUsersWithStats(filters, sortField, sortOrder);
+  const { filters, sortField, sortOrder, page, limit } = buildUserFilters(req.query);
+  const { users: usersWithStats } = await fetchUsersWithStats(filters, sortField, sortOrder, page, limit);
 
   const headers = ['Nome', 'Email', 'Departamento', 'Role', 'Pontos', 'Nível', 'Badges', 'Criado em'];
-  const rows = usersWithStats.map((user) => [
+  const rows = usersWithStats.map((user: UserWithStats) => [
     `"${user.name}"`,
     `"${user.email}"`,
     `"${user.department}"`,
@@ -509,7 +584,10 @@ export const exportUsersCsv = async (req: AuthRequest, res: Response): Promise<v
     new Date(user.createdAt).toISOString(),
   ]);
 
-  const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+  const csvContent = [
+    headers.join(','),
+    ...rows.map((row) => row.map((cell) => String(cell)).join(','))
+  ].join('\n');
 
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename="users.csv"');
@@ -542,7 +620,7 @@ export const exportMyData = async (req: AuthRequest, res: Response): Promise<voi
   ] = await Promise.all([
     Task.find({ createdBy: userId }).lean(),
     Task.find({ assignedTo: userId }).lean(),
-    Goal.find({ owner: userId }).lean(),
+    Goal.find({ createdBy: userId }).lean(),
     Points.find({ user: userId }).sort({ createdAt: -1 }).lean(),
     UserBadge.find({ user: userId }).populate('badge').lean(),
     TeamMember.find({ user: userId }).populate('team').lean(),

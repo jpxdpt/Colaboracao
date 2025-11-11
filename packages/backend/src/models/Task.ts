@@ -1,7 +1,8 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { TaskStatus } from '@gamify/shared';
+import mongoose, { Schema } from 'mongoose';
+import { TaskStatus } from '@taskify/shared';
+import { IBaseDocument } from './BaseDocument';
 
-export interface ITask extends Document {
+export interface ITask extends IBaseDocument {
   title: string;
   description?: string;
   status: TaskStatus;
@@ -97,6 +98,9 @@ const TaskSchema = new Schema<ITask>(
 TaskSchema.index({ status: 1, assignedTo: 1 });
 TaskSchema.index({ status: 1, createdBy: 1 });
 TaskSchema.index({ dueDate: 1, status: 1 });
+TaskSchema.index({ assignedTo: 1, priority: -1, dueDate: 1 }); // Para dashboard do usuário
+TaskSchema.index({ createdBy: 1, status: 1, createdAt: -1 }); // Para listagem de tarefas criadas
+TaskSchema.index({ parentTask: 1, status: 1 }); // Para subtarefas
 
 export const Task = mongoose.model<ITask>('Task', TaskSchema);
 

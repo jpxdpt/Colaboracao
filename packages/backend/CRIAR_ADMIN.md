@@ -12,7 +12,7 @@ npm run create-admin
 ```
 
 O script irá:
-1. Compilar automaticamente o package `@gamify/shared` (se necessário)
+1. Compilar automaticamente o package `@taskify/shared` (se necessário)
 2. Solicitar os seguintes dados:
    - **Email**: Email do administrador
    - **Nome**: Nome completo
@@ -29,7 +29,7 @@ npm run promote-admin
 ```
 
 O script irá:
-1. Compilar automaticamente o package `@gamify/shared` (se necessário)
+1. Compilar automaticamente o package `@taskify/shared` (se necessário)
 2. Solicitar apenas:
    - **Email**: Email do usuário a promover
 

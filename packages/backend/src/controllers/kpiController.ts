@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { getUserKPIs } from '../services/kpiService';
 import { AuthRequest } from '../middleware/auth';
+import { logger } from '../utils/logger';
 
 /**
  * GET /api/kpis - KPIs do utilizador
@@ -16,7 +17,10 @@ export const getUserKPIsHandler = async (req: AuthRequest, res: Response): Promi
     const kpis = await getUserKPIs(userId);
     res.json(kpis);
   } catch (error) {
-    console.error('Erro ao buscar KPIs:', error);
+    logger.error('Erro ao buscar KPIs do utilizador', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      userId: req.user?._id
+    });
     res.status(500).json({ error: 'Erro ao buscar KPIs' });
   }
 };

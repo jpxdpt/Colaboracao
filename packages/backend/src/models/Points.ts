@@ -1,6 +1,7 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
+import { IBaseDocument } from './BaseDocument';
 
-export interface IPoints extends Document {
+export interface IPoints extends IBaseDocument {
   user: mongoose.Types.ObjectId;
   amount: number;
   source: string; // task/goal/report/training/challenge/etc
@@ -56,4 +57,5 @@ PointsSchema.index({ source: 1, timestamp: -1 });
 PointsSchema.index({ user: 1, source: 1 });
 
 export const Points = mongoose.model<IPoints>('Points', PointsSchema);
+
 

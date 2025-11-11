@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import Card from '../ui/Card';
-import { TaskStatus } from '@gamify/shared';
+import { TaskStatus } from '@shared';
 
 interface Task {
   _id: string;

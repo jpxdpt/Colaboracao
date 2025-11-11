@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Script auxiliar para garantir que @gamify/shared está compilado antes de executar outro script
+ * Script auxiliar para garantir que @taskify/shared está compilado antes de executar outro script
  */
 
 import { execSync } from 'child_process';
@@ -19,7 +19,7 @@ if (!scriptToRun) {
 
 try {
   // Compilar shared primeiro
-  console.log('📦 Compilando @gamify/shared...');
+  console.log('📦 Compilando @taskify/shared...');
   execSync('npm run build', {
     cwd: join(__dirname, '../../shared'),
     stdio: 'inherit',

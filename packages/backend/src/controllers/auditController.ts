@@ -43,12 +43,15 @@ export const getAuditLogs = async (req: AuthRequest, res: Response): Promise<voi
   }
 
   if (from || to) {
-    filters.createdAt = {};
+    const dateFilter: { $gte?: Date; $lte?: Date } = {};
     if (from && typeof from === 'string') {
-      filters.createdAt.$gte = new Date(from);
+      dateFilter.$gte = new Date(from);
     }
     if (to && typeof to === 'string') {
-      filters.createdAt.$lte = new Date(to);
+      dateFilter.$lte = new Date(to);
+    }
+    if (Object.keys(dateFilter).length > 0) {
+      filters.createdAt = dateFilter;
     }
   }
 

@@ -43,7 +43,7 @@ export const getWeeklySummary = async (req: AuthRequest, res: Response): Promise
     weekStart.setHours(0, 0, 0, 0);
 
     // Buscar dados da semana
-    const [pointsEarned, tasksCompleted, goalsAchieved, streak, levelProgress] = await Promise.all([
+    const [pointsEarned, tasksCompleted, goalsAchieved, streak, levelProgress, totalPointsOverall] = await Promise.all([
       Points.aggregate([
         {
           $match: {
@@ -64,12 +64,13 @@ export const getWeeklySummary = async (req: AuthRequest, res: Response): Promise
         completedAt: { $gte: weekStart },
       }),
       Goal.countDocuments({
-        owner: userId,
+        createdBy: userId,
         status: 'completed',
         updatedAt: { $gte: weekStart },
       }),
       Streak.findOne({ user: userId, type: 'daily_tasks' }).lean(),
       getLevelProgress(userId),
+      getTotalPoints(userId),
     ]);
 
     const totalPoints = pointsEarned[0]?.total || 0;
@@ -122,8 +123,10 @@ export const getWeeklySummary = async (req: AuthRequest, res: Response): Promise
       streakDays: streak?.consecutiveDays || 0,
       levelProgress: {
         currentLevel: levelProgress.currentLevel,
-        pointsToNextLevel: levelProgress.pointsToNextLevel,
-        progressPercentage: levelProgress.progressPercentage,
+        pointsToNextLevel: levelProgress.pointsNext
+          ? Math.max(0, levelProgress.pointsNext - totalPointsOverall)
+          : 0,
+        progressPercentage: levelProgress.progress,
       },
       topAchievements: achievements,
       recommendations,
