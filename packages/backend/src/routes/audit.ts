@@ -1,0 +1,12 @@
+import { Router } from 'express';
+import { getAuditLogs } from '../controllers/auditController';
+import { authenticate, authorize } from '../middleware/auth';
+import { UserRole } from '@gamify/shared';
+
+const router = Router();
+
+router.get('/', authenticate, authorize(UserRole.ADMIN), getAuditLogs);
+
+export default router;
+
+
