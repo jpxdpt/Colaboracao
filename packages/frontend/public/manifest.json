@@ -1,6 +1,6 @@
 {
-  "name": "Gamify - Aplicação Gamificada",
-  "short_name": "Gamify",
+  "name": "Taskify - Aplicação Gamificada",
+  "short_name": "Taskify",
   "description": "Aplicação gamificada para colaboradores",
   "start_url": "/",
   "display": "standalone",
@@ -19,5 +19,6 @@
     }
   ]
 }
+
 
 

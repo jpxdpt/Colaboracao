@@ -157,9 +157,9 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
             animate={{ opacity: isCollapsed ? 0 : 1 }}
             transition={{ duration: 0.2 }}
           >
-            <h1 className="text-2xl font-bold text-gradient-purple flex items-center gap-2">
-              <span className="text-3xl">🎮</span>
-              <span>Gamify</span>
+            <h1 className="text-2xl font-bold text-gradient-purple flex items-center gap-3">
+              <CheckSquare className="w-7 h-7 text-[var(--color-text-primary)]" />
+              <span>Taskify</span>
             </h1>
           </motion.div>
 
