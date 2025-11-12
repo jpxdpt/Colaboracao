@@ -1,8 +1,15 @@
 # Taskify - Pesquisa de Mercado, Visão do Produto e Modelo de Negócio
 
+## Resumo (para decisão rápida)
+- Plataforma de gestão de trabalho com Gamificação séria e IA aplicada ao negócio.
+- Aumenta produtividade e alinhamento; melhora motivação e visibilidade em tempo real.
+- IA híbrida (local + cloud) com controlo de dados e compliance.
+- Implementação rápida; integra com CRM/Helpdesk/ERP/HRIS já existentes.
+- Planos por escalões com preço fixo mensal; piloto de 60 dias disponível.
+
 ## 1. Visão Geral do Projeto
 
-A Taskify é uma plataforma integrada de gestão de trabalho, gamification e inteligência artificial desenhada para equipas modernas.
+A Taskify é uma plataforma integrada de gestão de trabalho, gamificação e inteligência artificial desenhada para equipas modernas.
 
 Não é apenas um gestor de tarefas, nem apenas um sistema de pontos: é uma camada de foco, motivação e decisão inteligente por cima das ferramentas e processos que as empresas já utilizam.
 
@@ -12,7 +19,7 @@ Pilares principais do projeto:
   - Gestão de tarefas, metas e objetivos por utilizador, equipa e organização.
   - Vistas avançadas (Kanban, Gantt, dashboards) pensadas para equipas operacionais, comerciais, suporte e projetos.
 
-- Gamificatio séria
+- Gamificação séria
   - Pontos, níveis, badges, rankings, desafios e recompensas alinhados a KPIs reais.
   - Mecanismos configuráveis por cliente para incentivar comportamentos desejados (ex.: contactos realizados, tickets resolvidos, formação concluída, qualidade de serviço).
 
@@ -55,7 +62,7 @@ Gap identificado:
 Poucos produtos combinam, de forma integrada:
 
 - foco operacional diário (tarefas e objetivos acionáveis),
-- gamification alinhada a KPIs reais,
+- gamificação alinhada a KPIs reais,
 - IA com contexto do negócio,
 - opção híbrida local+cloud para setores regulados.
 
@@ -105,6 +112,13 @@ Poucos produtos combinam, de forma integrada:
   - Integração com CRM, helpdesk, ERP, HRIS e outras fontes.
   - Transformação de eventos reais em pontos, tarefas e insights automáticos.
 
+### 4.1 Segurança, Privacidade e Compliance
+- Conformidade: LGPD/GDPR-ready; DPA sob pedido.
+- Dados: residência em UE por omissão; opção on-prem/VPC (Enterprise).
+- Controlo de dados: opt-in/opt-out para envio a terceiros; logs e auditoria.
+- IA Híbrida: execução local-first com fallback; minimização e mascaramento de dados.
+- Governação: gestão de segredos; políticas de retenção e eliminação sob pedido.
+
 ## 5. Segmentação e Go-to-Market
 
 ### 5.1 Segmentos-Alvo Prioritários
@@ -128,7 +142,7 @@ Modelo base:
 
 - Licenciamento por utilizador ativo/mês.
 - Inclui:
-  - Plataforma de tarefas + gamification.
+  - Plataforma de tarefas + gamificação.
   - Dashboards standard.
   - Suporte e manutenção.
 
@@ -166,6 +180,18 @@ Valores de referência (ajustáveis conforme setor, país e maturidade do client
     - Arquitetura híbrida (on-prem/VPC), controlo rigoroso de dados.
     - Integrações avançadas, SLAs dedicados, governação e auditoria.
 
+Tabela de referência (por escalões):
+
+| Plano        | Utilizadores | Preço/mês | IA          | Integrações | Suporte      | SLA    |
+|--------------|--------------|-----------|-------------|-------------|--------------|--------|
+| Growth       | até 50       | 250€      | —           | 0           | Email        | -      |
+| Growth+      | até 100      | 400€      | —           | 0           | Email        | -      |
+| Growth Max   | até 250      | 700€      | —           | 0           | Email        | -      |
+| Performance  | até 50       | 450€      | Básica      | 1–2         | Email/Chat   | 99.5%  |
+| Performance+ | até 100      | 700€      | Básica      | 1–2         | Email/Chat   | 99.5%  |
+| Perf. Max    | até 250      | 1 100€    | Básica      | 1–2         | Email/Chat   | 99.5%  |
+| Enterprise   | 250+         | 2 000€+   | Avançada    | Ilimitadas  | Dedicado     | 99.9%  |
+
 Notas internas (para afinar preço por cliente):
 
 - Estes valores correspondem, em média, a uma lógica de 3€–18€ por utilizador/mês, mas apresentados em formato de pacote fixo para facilitar a venda.
@@ -174,7 +200,7 @@ Notas internas (para afinar preço por cliente):
 ### 6.3 Add-ons (Upsell)
 
 - Setup / Onboarding
-  - 1 500€–10 000€ (consoante número de equipas, integrações e desenho de regras de gamification).
+  - 1 500€–10 000€ (consoante número de equipas, integrações e desenho de regras de gamificação).
 
 - Integrações Custom
   - 1 000€–5 000€ por integração específica não coberta nos conectores standard.
@@ -217,6 +243,11 @@ Os valores propostos são baseados em três pilares principais:
   - PME/mid-market: budget típico 250€–1 500€/mês para software de gestão + performance.
   - Enterprise (200+ utilizadores, setores regulados): budget maior, aceita 2 000€+/mês, sobretudo com requisitos de segurança e IA híbrida.
 
+### 6.6 KPIs e ROI
+- KPIs: tarefas críticas/semana, adherence a processos, AHT/SLAs (suporte), conversões (comercial).
+- ROI tipo: +1–3% de produtividade costuma cobrir o custo mensal dos planos.
+- Reporting: dashboards por equipa, alertas de risco, exportações para BI.
+
 ## 7. Diferenciação Estratégica
 
 - Gamificação séria, ligada a objetivos reais (não apenas "jogos de pontos").
@@ -233,16 +264,24 @@ Os valores propostos são baseados em três pilares principais:
   - Deck de 8–12 slides com problema, solução, IA, segurança, casos e planos.
 - Focar abordagem inicial em 2–3 segmentos com maior fit (ex.: contact centers e equipas comerciais).
 
+### 8.1 Oferta de Piloto (60 dias)
+- Âmbito: 1 equipa (20–50 utilizadores), 1–2 integrações, desafios configurados.
+- Critérios de sucesso (exemplos):
+  - +15% em tarefas críticas concluídas por semana,
+  - +10% em taxa de conclusão de formações/processos,
+  - Engagement: ≥70% de utilizadores ativos semanais.
+- Entregáveis: setup, formação, acompanhamento, relatório final de impacto.
+
 Este documento serve como base estruturada para posicionamento comercial da Taskify junto de empresas, podendo ser adaptado para propostas, apresentações e website.
 
 ## 9. Referências e Fontes
 
-Os intervalos de preços e o posicionamento foram inspirados por benchmarks públicos e práticas comuns em SaaS B2B, gamification e performance management. Exemplos de referências que suportam a ordem de grandeza proposta:
+Os intervalos de preços e o posicionamento foram inspirados por benchmarks públicos e práticas comuns em SaaS B2B, gamificação e performance management. Exemplos de referências que suportam a ordem de grandeza proposta:
 
 - Gamificação corporativa e engagement:
-  - Bunchball / BI WORLDWIDE: modelos de gamification B2B orientados a performance.
+  - Bunchball / BI WORLDWIDE: modelos de Gamificação B2B orientados a performance.
     - https://www.biworldwide.com/solutions/employee-recognition/gamification/
-  - Centrical: plataforma de gamification e performance para contact centers e equipas.
+  - Centrical: plataforma de gamificação e performance para contact centers e equipas.
     - https://centrical.com/
 
 - Plataformas de performance, OKR e people success:
@@ -270,3 +309,6 @@ Os intervalos de preços e o posicionamento foram inspirados por benchmarks púb
   - Comparação entre esse ganho potencial e o custo mensal dos planos Taskify propostos, garantindo margem confortável para o cliente.
 
 Nota: Estes links servem como referência conceptual e de ordem de grandeza; o pricing final da Taskify deve ser ajustado com base em custos reais, posicionamento estratégico e feedback do mercado-alvo.
+
+## Próximo Passo
+Agendar uma sessão de 45 minutos para mapear objetivos, escolher o escalão e, se aplicável, iniciar um piloto de 60 dias.
