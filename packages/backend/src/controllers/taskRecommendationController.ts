@@ -4,7 +4,13 @@ import { AuthRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 
 interface RecommendedTask {
-  task: any;
+  task: {
+    _id: string;
+    title: string;
+    status: string;
+    priority: string;
+    dueDate?: string;
+  };
   score: number;
   reasons: string[];
 }

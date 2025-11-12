@@ -246,26 +246,46 @@ export const getLevelProgress = async (userId: string): Promise<{
   };
 };
 
+interface PointHistoryEntry {
+  _id: string;
+  points: number;
+  reason: string;
+  timestamp: Date;
+  task?: string;
+}
+
+interface UserBadgeEntry {
+  _id: string;
+  badge: {
+    _id: string;
+    name: string;
+    description: string;
+    icon: string;
+    rarity: string;
+  };
+  earnedAt: Date;
+}
+
 /**
  * Busca histórico de pontos do utilizador
  */
 export const getPointsHistory = async (
   userId: string,
   limit = 50
-): Promise<any[]> => {
+): Promise<PointHistoryEntry[]> => {
   return Points.find({ user: userId })
     .sort({ timestamp: -1 })
     .limit(limit)
-    .lean();
+    .lean() as Promise<PointHistoryEntry[]>;
 };
 
 /**
  * Busca badges do utilizador
  */
-export const getUserBadges = async (userId: string): Promise<any[]> => {
+export const getUserBadges = async (userId: string): Promise<UserBadgeEntry[]> => {
   return UserBadge.find({ user: userId })
     .populate('badge')
     .sort({ earnedAt: -1 })
-    .lean();
+    .lean() as Promise<UserBadgeEntry[]>;
 };
 

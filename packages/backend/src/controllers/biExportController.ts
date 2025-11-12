@@ -37,8 +37,8 @@ export const exportDataToCsv = async (req: AuthRequest, res: Response): Promise<
               task.priority,
               task.points || 0,
               task.dueDate ? new Date(task.dueDate).toISOString() : '',
-              task.assignedTo ? (task.assignedTo as any).name : '',
-              (task.createdBy as any).name,
+              task.assignedTo?.name || '',
+              task.createdBy.name,
               new Date(task.createdAt).toISOString(),
             ].join(',')
           ),
@@ -136,8 +136,8 @@ export const exportDataToJson = async (req: AuthRequest, res: Response): Promise
           priority: task.priority,
           points: task.points || 0,
           dueDate: task.dueDate ? new Date(task.dueDate).toISOString() : null,
-          assignedTo: task.assignedTo ? (task.assignedTo as any).name : null,
-          createdBy: (task.createdBy as any).name,
+          assignedTo: task.assignedTo?.name || null,
+          createdBy: task.createdBy.name,
           createdAt: new Date(task.createdAt).toISOString(),
         }));
         break;

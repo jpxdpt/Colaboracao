@@ -10,9 +10,10 @@ import {
   verifyRefreshToken,
 } from '../services/authService';
 import { registerSchema, loginSchema, changePasswordSchema } from '@taskify/shared';
+import { validateQuery, userFilterSchema } from '../middleware/validation';
+import { sanitizeUser, escapeRegex } from '../utils/sanitization';
 import { AuditLog } from '../models/AuditLog';
 import { UserRole } from '@taskify/shared';
-import { getTotalPoints, getLevelProgress, getUserBadges } from '../services/gamificationService';
 import { Task, Goal, Points, UserBadge, TeamMember, Team, Level } from '../models';
 import mongoose from 'mongoose';
 
@@ -44,7 +45,7 @@ interface UsersWithStatsResult {
 }
 
 const buildUserFilters = (
-  query: Record<string, unknown>
+  req: AuthRequest
 ): {
   filters: Record<string, unknown>;
   sortField: string;
@@ -52,7 +53,17 @@ const buildUserFilters = (
   page: number;
   limit: number;
 } => {
-  const { search, role, department, sortBy = 'name', order = 'asc', includeDeleted, page = 1, limit = 10 } = query;
+  const validatedQuery = (req as any).validatedQuery as z.infer<typeof userFilterSchema>;
+  const {
+    search,
+    role,
+    department,
+    sortBy = 'name',
+    order = 'asc',
+    includeDeleted,
+    page = 1,
+    limit = 10
+  } = validatedQuery;
 
   const filters: Record<string, unknown> = {};
 
@@ -63,26 +74,27 @@ const buildUserFilters = (
     filters.isDeleted = { $ne: true };
   }
 
-  // Filtro de busca
-  if (typeof search === 'string' && search.trim()) {
-    const regex = new RegExp(search.trim(), 'i');
+  // Filtro de busca (com sanitização)
+  if (search && search.trim()) {
+    const escapedSearch = escapeRegex(search.trim());
+    const regex = new RegExp(escapedSearch, 'i');
     filters.$or = [{ name: regex }, { email: regex }, { department: regex }];
   }
 
   // Filtro de role
-  if (typeof role === 'string' && role) {
+  if (role) {
     filters.role = role;
   }
 
   // Filtro de departamento
-  if (typeof department === 'string' && department) {
+  if (department) {
     filters.department = department;
   }
 
-  const sortField = typeof sortBy === 'string' && sortBy ? sortBy : 'name';
+  const sortField = sortBy || 'name';
   const sortOrder = order === 'desc' ? -1 : 1;
-  const pageNum = typeof page === 'number' ? page : parseInt(page as string) || 1;
-  const limitNum = typeof limit === 'number' ? Math.min(limit, 100) : Math.min(parseInt(limit as string) || 10, 100);
+  const pageNum = page || 1;
+  const limitNum = Math.min(limit || 10, 100);
 
   return {
     filters,
@@ -185,7 +197,7 @@ const fetchUsersWithStats = async (
   }
 
   return {
-    users: usersWithStats,
+    users: usersWithStats.map(user => sanitizeUser(user as any)),
     pagination: {
       page,
       limit,
@@ -452,7 +464,7 @@ export const getUsers = async (req: AuthRequest, res: Response): Promise<void> =
     throw new AppError('Acesso negado. Apenas administradores podem listar usuários.', 403);
   }
 
-  const { filters, sortField, sortOrder, page, limit } = buildUserFilters(req.query);
+  const { filters, sortField, sortOrder, page, limit } = buildUserFilters(req);
   const result = await fetchUsersWithStats(filters, sortField, sortOrder, page, limit);
 
   res.json({
@@ -569,7 +581,7 @@ export const exportUsersCsv = async (req: AuthRequest, res: Response): Promise<v
     throw new AppError('Acesso negado. Apenas administradores podem exportar utilizadores.', 403);
   }
 
-  const { filters, sortField, sortOrder, page, limit } = buildUserFilters(req.query);
+  const { filters, sortField, sortOrder, page, limit } = buildUserFilters(req);
   const { users: usersWithStats } = await fetchUsersWithStats(filters, sortField, sortOrder, page, limit);
 
   const headers = ['Nome', 'Email', 'Departamento', 'Role', 'Pontos', 'Nível', 'Badges', 'Criado em'];

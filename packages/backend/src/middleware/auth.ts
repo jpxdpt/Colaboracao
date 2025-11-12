@@ -42,12 +42,7 @@ export const authenticate = async (
     }
 
     const token = authHeader.substring(7);
-    if (process.env.NODE_ENV === 'development') {
-      logger.debug('Token extraído', {
-        tokenLength: token.length,
-        path: req.path
-      });
-    }
+    // Log apenas informações não sensíveis
 
     // Verificar se token está na blacklist (ignorar erros se Redis não estiver disponível)
     try {

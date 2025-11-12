@@ -14,6 +14,7 @@ import {
   deleteMyAccount,
 } from '../controllers/authController';
 import { authenticate, authorize } from '../middleware/auth';
+import { validateQuery, userFilterSchema } from '../middleware/validation';
 import expressRateLimit from 'express-rate-limit';
 import { UserRole } from '@taskify/shared';
 
@@ -38,7 +39,7 @@ router.post('/logout', authenticate, logout);
 router.get('/me', authenticate, getProfile);
 router.put('/change-password', authenticate, changePassword);
 router.get('/users/export/csv', authenticate, authorize(UserRole.ADMIN), exportUsersCsv);
-router.get('/users', authenticate, authorize(UserRole.ADMIN), getUsers);
+router.get('/users', authenticate, authorize(UserRole.ADMIN), validateQuery(userFilterSchema), getUsers);
 router.patch('/users/:id/role', authenticate, authorize(UserRole.ADMIN), updateUserRole);
 router.post('/users/:id/reset-password', authenticate, authorize(UserRole.ADMIN), resetUserPassword);
 router.get('/me/export', authenticate, exportMyData);

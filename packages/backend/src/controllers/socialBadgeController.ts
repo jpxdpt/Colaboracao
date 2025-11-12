@@ -132,7 +132,7 @@ export const getUserSocialBadges = async (req: AuthRequest, res: Response): Prom
       })
       .lean();
 
-    const socialBadges = userBadges.filter((ub) => ub.badge && (ub.badge as any).socialBadge);
+    const socialBadges = userBadges.filter((ub) => ub.badge && (ub.badge as { socialBadge?: boolean }).socialBadge);
 
     res.json({
       success: true,
