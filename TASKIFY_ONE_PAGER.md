@@ -81,6 +81,24 @@ Agendar uma sessão de 45 minutos para mapear objetivos, escolher escalão e, se
 
 ---
 
+## Fontes e Referências
+
+Os preços e posicionamento são baseados em benchmarks de mercado de plataformas similares:
+- **Gamificação**: Bunchball/BI WORLDWIDE, Centrical
+- **Performance/OKRs**: Lattice, Leapsome, Gtmhub, Perdoo
+- **IA aplicada**: Microsoft Copilot, GitHub Copilot
+
+## Fontes de Referência
+
+Os preços e benchmarks foram baseados em:
+
+- **Gamificação Corporativa**: Bunchball (5-15€/usuário/mês), Centrical
+- **Performance/OKRs**: Lattice (3-10€/usuário/mês), Leapsome, Gtmhub
+- **SaaS B2B Portugal**: Benchmarks de 250-1500€/mês para soluções de gestão
+- **ROI Produtividade**: Estudos mostram +1-3% em produtividade justifica investimento
+
+*Referências completas disponíveis no documento técnico detalhado.*
+
 **Taskify** - Transformando trabalho em progresso visível e recompensador.
 
 *Contato: [seu-email] | [seu-telefone] | www.taskify.com*
