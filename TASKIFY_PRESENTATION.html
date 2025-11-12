@@ -6,7 +6,7 @@
     <title>Taskify - Apresentação Executiva</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,26 +14,12 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            --secondary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --accent-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --dark-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.18);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.85);
-            --gold: #ffd700;
-            --gold-glow: rgba(255, 215, 0, 0.4);
-        }
-
         body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #000;
-            color: var(--text-primary);
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #e8e8e8;
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            line-height: 1.6;
         }
 
         .presentation {
@@ -41,28 +27,6 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-        }
-
-        /* Animated Background Particles */
-        .slide::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(250, 112, 154, 0.1) 0%, transparent 50%);
-            animation: float 20s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
         }
 
         .slide {
@@ -75,235 +39,156 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 80px 60px;
-            background: var(--primary-gradient);
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
+            padding: 60px 80px;
             opacity: 0;
-            transform: translateX(100%) scale(0.95);
-            transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            transform: translateX(100%);
+            transition: transform 0.6s ease, opacity 0.6s ease;
         }
 
         .slide.active {
             opacity: 1;
-            transform: translateX(0) scale(1);
+            transform: translateX(0);
         }
+
+        /* Slide backgrounds - cores mais naturais e sutis */
+        #slide-1 { background: #1a1a1a; }
+        #slide-2 { background: #1d1d1d; }
+        #slide-3 { background: #1a1a1a; }
+        #slide-4 { background: #1d1d1d; }
+        #slide-5 { background: #1a1a1a; }
+        #slide-6 { background: #1d1d1d; }
+        #slide-7 { background: #1a1a1a; }
+        #slide-8 { background: #0f0f0f; }
 
         .slide-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 700;
             margin-bottom: 20px;
             text-align: center;
-            background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c7d2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.02em;
+            color: #ffffff;
+            letter-spacing: -0.03em;
             line-height: 1.1;
-            text-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
-            animation: slideInDown 1s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .slide-title::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-            border-radius: 2px;
-            animation: expandLine 1s ease-out 0.5s both;
-        }
-
-        @keyframes expandLine {
-            from { width: 0; opacity: 0; }
-            to { width: 100px; opacity: 1; }
         }
 
         .slide-subtitle {
-            font-size: clamp(1.2rem, 2.5vw, 2rem);
-            margin-bottom: 30px;
+            font-size: 1.5rem;
+            margin-bottom: 40px;
             text-align: center;
-            color: var(--text-secondary);
+            color: #b0b0b0;
             font-weight: 300;
-            letter-spacing: 0.05em;
-            animation: slideInUp 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
         }
 
         .content-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 30px;
-            width: 100%;
-            max-width: 1400px;
-            margin-top: 50px;
-        }
-
-        .content-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 45px 35px;
-            text-align: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: slideInUp 1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .content-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.5s;
-        }
-
-        .content-card:hover::before {
-            left: 100%;
-        }
-
-        .content-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .content-card h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(1.4rem, 2vw, 1.9rem);
-            margin-bottom: 20px;
-            color: var(--text-primary);
-            font-weight: 700;
-            letter-spacing: -0.01em;
-        }
-
-        .content-card p {
-            font-size: clamp(1rem, 1.5vw, 1.15rem);
-            line-height: 1.7;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .feature-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
             width: 100%;
             max-width: 1200px;
             margin-top: 50px;
         }
 
+        .content-card {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            border-color: #444;
+            transform: translateY(-4px);
+        }
+
+        .content-card h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .content-card p {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #c0c0c0;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
         .feature-item {
             display: flex;
-            align-items: center;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px 25px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: slideInLeft 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-item:nth-child(even) {
-            animation: slideInRight 1s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;
-        }
-
-        .feature-item::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--accent-gradient);
-            transform: scaleY(0);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .feature-item:hover::after {
-            transform: scaleY(1);
+            align-items: flex-start;
+            background: #252525;
+            border: 1px solid #333;
+            border-left: 3px solid #4a9eff;
+            border-radius: 6px;
+            padding: 24px 28px;
+            transition: all 0.2s ease;
         }
 
         .feature-item:hover {
-            transform: translateX(10px) scale(1.02);
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border-left-color: #6bb0ff;
+            background: #2a2a2a;
         }
 
         .feature-check {
-            font-size: 2.5rem;
-            margin-right: 20px;
-            filter: drop-shadow(0 4px 8px rgba(40, 167, 69, 0.3));
-            transition: transform 0.3s ease;
-        }
-
-        .feature-item:hover .feature-check {
-            transform: scale(1.2) rotate(5deg);
+            font-size: 1.2rem;
+            margin-right: 16px;
+            margin-top: 2px;
+            color: #4a9eff;
         }
 
         .feature-item strong {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(1rem, 1.5vw, 1.2rem);
-            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            color: #ffffff;
             font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .feature-item span {
+            color: #b0b0b0;
+            font-size: 0.95rem;
         }
 
         .pricing-container {
             width: 100%;
-            max-width: 1100px;
-            margin-top: 50px;
+            max-width: 900px;
+            margin-top: 40px;
         }
 
         .pricing-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
+            border-collapse: collapse;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .pricing-table th,
         .pricing-table td {
-            padding: 25px 20px;
+            padding: 20px;
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid #333;
         }
 
         .pricing-table th {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            font-weight: 700;
-            font-size: clamp(0.9rem, 1.2vw, 1.1rem);
-            font-family: 'Poppins', sans-serif;
+            background: #2a2a2a;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            font-family: 'Space Grotesk', sans-serif;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -312,79 +197,62 @@
             border-bottom: none;
         }
 
-        .pricing-table tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.03);
-        }
-
         .pricing-table tr:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: scale(1.01);
-            transition: all 0.3s ease;
+            background: #2a2a2a;
         }
 
         .pricing-table td {
-            color: var(--text-secondary);
-            font-size: clamp(0.9rem, 1.2vw, 1rem);
+            color: #c0c0c0;
+            font-size: 0.95rem;
         }
 
         .pricing-table td strong {
-            color: var(--text-primary);
-            font-weight: 700;
+            color: #ffffff;
+            font-weight: 600;
         }
 
         .price-highlight {
-            font-size: clamp(1.2rem, 2vw, 1.6rem);
-            font-weight: 800;
-            color: var(--gold);
-            text-shadow: 0 0 20px var(--gold-glow);
-            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #4a9eff;
+            font-family: 'Space Grotesk', sans-serif;
         }
 
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 35px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
             width: 100%;
-            max-width: 900px;
-            margin-top: 60px;
+            max-width: 1000px;
+            margin-top: 50px;
         }
 
         .stat-item {
             text-align: center;
-            animation: bounceIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both;
-            padding: 30px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            transition: all 0.4s ease;
+            padding: 30px 20px;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            transition: all 0.2s ease;
         }
 
         .stat-item:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.2);
-            border-color: var(--gold);
+            border-color: #444;
         }
 
         .stat-number {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 900;
-            color: var(--gold);
-            margin-bottom: 12px;
-            text-shadow: 0 0 30px var(--gold-glow);
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #4a9eff;
+            margin-bottom: 8px;
             line-height: 1;
         }
 
         .stat-label {
-            font-size: clamp(0.95rem, 1.5vw, 1.2rem);
-            color: var(--text-secondary);
-            font-weight: 500;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            font-weight: 400;
         }
 
         .navigation {
@@ -393,41 +261,32 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 15px;
+            gap: 12px;
             z-index: 1000;
         }
 
         .nav-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 2px solid var(--glass-border);
-            color: var(--text-primary);
-            font-size: 1.4rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            background: #252525;
+            border: 1px solid #333;
+            color: #ffffff;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         .nav-btn:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.15);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-btn:active:not(:disabled) {
-            transform: scale(0.95);
+            background: #2a2a2a;
+            border-color: #444;
         }
 
         .nav-btn:disabled {
-            opacity: 0.25;
+            opacity: 0.3;
             cursor: not-allowed;
         }
 
@@ -438,242 +297,122 @@
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             z-index: 1000;
         }
 
         .indicator {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.25);
+            width: 8px;
+            height: 40px;
+            border-radius: 4px;
+            background: #333;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid transparent;
-            position: relative;
-        }
-
-        .indicator::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: var(--gold);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
         }
 
         .indicator.active {
-            background: rgba(255, 255, 255, 0.4);
-            border-color: var(--gold);
-            transform: scale(1.3);
-        }
-
-        .indicator.active::before {
-            width: 8px;
-            height: 8px;
-            box-shadow: 0 0 15px var(--gold-glow);
+            background: #4a9eff;
+            width: 10px;
         }
 
         .indicator:hover {
-            transform: scale(1.2);
-            background: rgba(255, 255, 255, 0.3);
+            background: #555;
         }
 
-        .cta-slide {
-            background: var(--dark-gradient);
-            background-size: 200% 200%;
+        .indicator.active:hover {
+            background: #6bb0ff;
         }
 
         .cta-content {
             text-align: center;
-            max-width: 900px;
+            max-width: 700px;
         }
 
         .cta-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(2.5rem, 5vw, 3.5rem);
-            margin-bottom: 25px;
-            background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 50%, #4facfe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-            letter-spacing: -0.02em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 24px;
+            color: #ffffff;
+            font-weight: 700;
             line-height: 1.2;
         }
 
         .cta-text {
-            font-size: clamp(1.1rem, 2vw, 1.4rem);
-            margin-bottom: 50px;
-            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #b0b0b0;
             line-height: 1.6;
-            font-weight: 300;
         }
 
         .cta-button {
             display: inline-block;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #000;
-            padding: 22px 55px;
-            border-radius: 50px;
+            background: #4a9eff;
+            color: #ffffff;
+            padding: 16px 40px;
+            border-radius: 6px;
             text-decoration: none;
-            font-weight: 700;
-            font-size: clamp(1rem, 1.5vw, 1.25rem);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
-            animation: pulse 2.5s ease-in-out infinite;
-            font-family: 'Poppins', sans-serif;
-            letter-spacing: 0.02em;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .cta-button:hover::before {
-            left: 100%;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            border: none;
+            cursor: pointer;
         }
 
         .cta-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 50px rgba(255, 215, 0, 0.6);
+            background: #6bb0ff;
+            transform: translateY(-2px);
         }
 
-        .cta-button:active {
-            transform: translateY(-1px) scale(1.02);
+        .offer-box {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 32px;
+            margin: 40px 0;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .offer-box h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #4a9eff;
+            font-weight: 600;
         }
 
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .offer-box ul {
+            list-style: none;
+            color: #c0c0c0;
+            line-height: 2;
         }
 
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.2) rotate(-10deg);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.1) rotate(5deg);
-            }
-            70% {
-                transform: scale(0.95) rotate(-2deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
-            }
-            50% {
-                box-shadow: 0 10px 40px rgba(255, 215, 0, 0.7);
-            }
+        .offer-box li {
+            margin-bottom: 8px;
         }
 
         @media (max-width: 768px) {
             .slide {
-                padding: 40px 25px;
+                padding: 40px 30px;
             }
 
-            .content-grid,
-            .feature-list {
+            .slide-title {
+                font-size: 2.5rem;
+            }
+
+            .content-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .content-card,
-            .feature-item {
-                padding: 25px 20px;
-            }
-
-            .pricing-table {
-                font-size: 0.85rem;
-            }
-
-            .pricing-table th,
-            .pricing-table td {
-                padding: 15px 10px;
-            }
-
-            .navigation {
-                bottom: 25px;
-            }
-
-            .slide-indicators {
-                right: 20px;
             }
 
             .stats-container {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+            }
+
+            .slide-indicators {
+                right: 20px;
             }
         }
     </style>
@@ -684,11 +423,9 @@
         <div class="slide active" id="slide-1">
             <h1 class="slide-title">Taskify</h1>
             <p class="slide-subtitle">Plataforma de Gestão de Trabalho</p>
-            <p style="font-size: clamp(1.1rem, 2vw, 1.5rem); margin-top: 20px; opacity: 0.85; font-weight: 300;">com Gamificação e IA</p>
-            <div style="margin-top: 70px; animation: fadeInUp 1s ease-out 1s both;">
-                <div style="font-size: clamp(1rem, 1.8vw, 1.3rem); opacity: 0.9; font-weight: 300; letter-spacing: 0.05em;">
-                    Transformando trabalho diário em progresso visível e recompensador
-                </div>
+            <p style="font-size: 1.2rem; margin-top: 20px; color: #888;">com Gamificação e IA</p>
+            <div style="margin-top: 60px; font-size: 1rem; color: #999;">
+                Transformando trabalho diário em progresso visível e recompensador
             </div>
         </div>
 
@@ -697,19 +434,19 @@
             <h2 class="slide-title">O Que É a Taskify</h2>
             <div class="content-grid" style="margin-top: 50px;">
                 <div class="content-card">
-                    <h3>🎯 Gestão Inteligente</h3>
+                    <h3>Gestão Inteligente</h3>
                     <p>Kanban, listas e metas ligadas a KPIs reais do negócio</p>
                 </div>
                 <div class="content-card">
-                    <h3>🎮 Gamificação</h3>
+                    <h3>Gamificação</h3>
                     <p>Pontos, níveis, badges e rankings que incentivam comportamentos positivos</p>
                 </div>
                 <div class="content-card">
-                    <h3>🤖 IA Aplicada</h3>
+                    <h3>IA Aplicada</h3>
                     <p>Recomendações, previsões e assistente conversacional com contexto do negócio</p>
                 </div>
                 <div class="content-card">
-                    <h3>🔗 Integração</h3>
+                    <h3>Integração</h3>
                     <p>CRM, Helpdesk, ERP, HRIS - transforma eventos em pontos automaticamente</p>
                 </div>
             </div>
@@ -721,7 +458,7 @@
 
             <div class="content-grid">
                 <div class="content-card">
-                    <h3>📈 Para a Gestão</h3>
+                    <h3>Para a Gestão</h3>
                     <p>+ Produtividade através de foco inteligente<br>
                     Visibilidade em tempo real<br>
                     Dados acionáveis com IA<br>
@@ -729,7 +466,7 @@
                 </div>
 
                 <div class="content-card">
-                    <h3>👥 Para as Equipas</h3>
+                    <h3>Para as Equipas</h3>
                     <p>Clareza em tarefas e objetivos<br>
                     Motivação com gamificação<br>
                     Autonomia com IA<br>
@@ -744,20 +481,32 @@
 
             <div class="feature-list">
                 <div class="feature-item">
-                    <span class="feature-check">📞</span>
-                    <div><strong>Contact Centers:</strong> Métricas claras, equipas grandes, foco em SLA</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Contact Centers</strong>
+                        <span>Métricas claras, equipas grandes, foco em SLA</span>
+                    </div>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">💼</span>
-                    <div><strong>Equipas Comerciais:</strong> B2B/B2C, conversões, produtividade de vendas</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Equipas Comerciais</strong>
+                        <span>B2B/B2C, conversões, produtividade de vendas</span>
+                    </div>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">🏢</span>
-                    <div><strong>Operações:</strong> Seguros, banca, telecom, utilities, processos repetitivos</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Operações</strong>
+                        <span>Seguros, banca, telecom, utilities, processos repetitivos</span>
+                    </div>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">🔒</span>
-                    <div><strong>Setor Regulamentado:</strong> Financeiro, saúde, governo - compliance máxima</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Setor Regulamentado</strong>
+                        <span>Financeiro, saúde, governo - compliance máxima</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -768,24 +517,39 @@
 
             <div class="feature-list">
                 <div class="feature-item">
-                    <span class="feature-check">✅</span>
-                    <div><strong>Gestão de Tarefas:</strong> Kanban, Gantt, listas, metas</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Gestão de Tarefas</strong>
+                        <span>Kanban, Gantt, listas, metas</span>
+                    </div>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">🎯</span>
-                    <div><strong>Gamificação:</strong> Pontos, níveis, badges, rankings</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Gamificação</strong>
+                        <span>Pontos, níveis, badges, rankings</span>
+                    </div>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">🤖</span>
-                    <div><strong>IA:</strong> Recomendações, previsões, assistente</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>IA</strong>
+                        <span>Recomendações, previsões, assistente</span>
+                    </div>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">🔗</span>
-                    <div><strong>Integrações:</strong> CRM, Helpdesk, ERP, HRIS</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Integrações</strong>
+                        <span>CRM, Helpdesk, ERP, HRIS</span>
+                    </div>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-check">🔐</span>
-                    <div><strong>Segurança:</strong> Arquitetura híbrida, LGPD/GDPR</div>
+                    <span class="feature-check">→</span>
+                    <div>
+                        <strong>Segurança</strong>
+                        <span>Arquitetura híbrida, LGPD/GDPR</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -811,7 +575,7 @@
                             <td><strong>Growth</strong></td>
                             <td>até 50</td>
                             <td class="price-highlight">250€</td>
-                            <td>❌</td>
+                            <td>—</td>
                             <td>0</td>
                             <td>Email</td>
                         </tr>
@@ -819,7 +583,7 @@
                             <td><strong>Growth+</strong></td>
                             <td>até 100</td>
                             <td class="price-highlight">400€</td>
-                            <td>❌</td>
+                            <td>—</td>
                             <td>0</td>
                             <td>Email</td>
                         </tr>
@@ -835,7 +599,7 @@
                             <td><strong>Enterprise</strong></td>
                             <td>250+</td>
                             <td class="price-highlight">2 000€+</td>
-                            <td>Avançada (Híbrida)</td>
+                            <td>Avançada</td>
                             <td>Ilimitadas</td>
                             <td>Dedicado</td>
                         </tr>
@@ -867,14 +631,14 @@
                 </div>
             </div>
 
-            <p style="text-align: center; margin-top: 70px; font-size: clamp(1.1rem, 2vw, 1.4rem); opacity: 0.9; animation: fadeInUp 1s ease-out 1.5s both; line-height: 1.8;">
-                <strong style="color: var(--gold);">+ Receita:</strong> Melhor aproveitamento da força comercial<br>
-                <strong style="color: var(--gold);">- Rotatividade:</strong> Retenção e redução de custos de recrutamento
+            <p style="text-align: center; margin-top: 60px; font-size: 1.1rem; color: #b0b0b0; line-height: 1.8;">
+                <strong style="color: #4a9eff;">+ Receita:</strong> Melhor aproveitamento da força comercial<br>
+                <strong style="color: #4a9eff;">- Rotatividade:</strong> Retenção e redução de custos de recrutamento
             </p>
         </div>
 
         <!-- Slide 8: CTA -->
-        <div class="slide cta-slide" id="slide-8">
+        <div class="slide" id="slide-8">
             <div class="cta-content">
                 <h2 class="cta-title">Pronto para Transformar sua Equipa?</h2>
                 <p class="cta-text">
@@ -882,29 +646,25 @@
                     escolher escalão e iniciar piloto de 60 dias.
                 </p>
 
-                <div style="margin: 60px 0; animation: fadeInUp 1s ease-out 0.5s both;">
-                    <h3 style="font-size: clamp(1.3rem, 2.5vw, 1.7rem); margin-bottom: 25px; color: var(--gold); font-weight: 700; font-family: 'Poppins', sans-serif;">
-                        🎯 Oferta Especial: Piloto de 60 Dias
-                    </h3>
-                    <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(20px); padding: 30px; border-radius: 20px; margin-bottom: 35px; border: 1px solid rgba(255,255,255,0.15);">
-                        <ul style="text-align: left; color: var(--text-secondary); line-height: 2; list-style: none; padding: 0; max-width: 600px; margin: 0 auto;">
-                            <li style="margin-bottom: 12px;">✓ 1 equipa (20-50 utilizadores)</li>
-                            <li style="margin-bottom: 12px;">✓ 1-2 integrações incluídas</li>
-                            <li style="margin-bottom: 12px;">✓ Setup e formação completos</li>
-                            <li style="margin-bottom: 12px;">✓ Critérios de sucesso: +15% tarefas/semana</li>
-                            <li style="margin-bottom: 12px;">✓ Relatório final de impacto</li>
-                            <li style="margin-bottom: 12px;">✓ Preço: 500-1 000€/mês</li>
-                        </ul>
-                    </div>
-
-                    <a href="mailto:seu-email@empresa.com?subject=Interesse%20em%20Taskify&body=Olá,%20gostaria%20de%20agendar%20uma%20sessão%20para%20conhecer%20a%20Taskify." class="cta-button">
-                        📅 Agendar Demonstração
-                    </a>
+                <div class="offer-box">
+                    <h3>Oferta Especial: Piloto de 60 Dias</h3>
+                    <ul>
+                        <li>1 equipa (20-50 utilizadores)</li>
+                        <li>1-2 integrações incluídas</li>
+                        <li>Setup e formação completos</li>
+                        <li>Critérios de sucesso: +15% tarefas/semana</li>
+                        <li>Relatório final de impacto</li>
+                        <li>Preço: 500-1 000€/mês</li>
+                    </ul>
                 </div>
 
-                <p style="margin-top: 50px; opacity: 0.7; animation: fadeInUp 1s ease-out 1s both; font-size: clamp(0.9rem, 1.5vw, 1.1rem); line-height: 1.8;">
+                <a href="mailto:seu-email@empresa.com?subject=Interesse%20em%20Taskify&body=Olá,%20gostaria%20de%20agendar%20uma%20sessão%20para%20conhecer%20a%20Taskify." class="cta-button">
+                    Agendar Demonstração
+                </a>
+
+                <p style="margin-top: 50px; color: #666; font-size: 0.9rem;">
                     Taskify - Transformando trabalho em progresso visível e recompensador<br>
-                    <span style="font-size: 0.85em;">Contato: [seu-email] | [seu-telefone] | www.taskify.com</span>
+                    Contato: [seu-email] | [seu-telefone] | www.taskify.com
                 </p>
             </div>
         </div>
@@ -912,8 +672,8 @@
 
     <!-- Navigation -->
     <div class="navigation">
-        <button class="nav-btn" id="prev-btn" disabled>❮</button>
-        <button class="nav-btn" id="next-btn">❯</button>
+        <button class="nav-btn" id="prev-btn" disabled>‹</button>
+        <button class="nav-btn" id="next-btn">›</button>
     </div>
 
     <!-- Slide Indicators -->
